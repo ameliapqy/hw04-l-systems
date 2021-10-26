@@ -1,17 +1,18 @@
-import {vec3} from 'gl-matrix';
+import { vec3 } from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
 import Square from './geometry/Square';
 import ScreenQuad from './geometry/ScreenQuad';
 import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
-import {setGL} from './globals';
-import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
+import { setGL } from './globals';
+import ShaderProgram, { Shader } from './rendering/gl/ShaderProgram';
+
+import Turtle from './lsystem/Turtle';
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
-const controls = {
-};
+const controls = {};
 
 let square: Square;
 let screenQuad: ScreenQuad;
@@ -31,8 +32,8 @@ function loadScene() {
   let offsetsArray = [];
   let colorsArray = [];
   let n: number = 100.0;
-  for(let i = 0; i < n; i++) {
-    for(let j = 0; j < n; j++) {
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
       offsetsArray.push(i);
       offsetsArray.push(j);
       offsetsArray.push(0);
@@ -62,8 +63,8 @@ function main() {
   const gui = new DAT.GUI();
 
   // get canvas and webgl context
-  const canvas = <HTMLCanvasElement> document.getElementById('canvas');
-  const gl = <WebGL2RenderingContext> canvas.getContext('webgl2');
+  const canvas = <HTMLCanvasElement>document.getElementById('canvas');
+  const gl = <WebGL2RenderingContext>canvas.getContext('webgl2');
   if (!gl) {
     alert('WebGL 2 not supported!');
   }
@@ -100,21 +101,23 @@ function main() {
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
     renderer.render(camera, flat, [screenQuad]);
-    renderer.render(camera, instancedShader, [
-      square,
-    ]);
+    renderer.render(camera, instancedShader, [square]);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
     requestAnimationFrame(tick);
   }
 
-  window.addEventListener('resize', function() {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.setAspectRatio(window.innerWidth / window.innerHeight);
-    camera.updateProjectionMatrix();
-    flat.setDimensions(window.innerWidth, window.innerHeight);
-  }, false);
+  window.addEventListener(
+    'resize',
+    function () {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.setAspectRatio(window.innerWidth / window.innerHeight);
+      camera.updateProjectionMatrix();
+      flat.setDimensions(window.innerWidth, window.innerHeight);
+    },
+    false
+  );
 
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.setAspectRatio(window.innerWidth / window.innerHeight);
