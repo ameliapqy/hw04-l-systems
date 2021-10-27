@@ -5,6 +5,8 @@ import Drawable from '../rendering/gl/Drawable';
 // (possibly with multiple outcomes depending on a probability).
 class DrawingRule {
   operation: any;
+  controls: any;
+  
   constructor(func: any) {
     this.operation = func;
   }

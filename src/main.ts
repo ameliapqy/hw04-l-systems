@@ -9,13 +9,23 @@ import { setGL } from './globals';
 import ShaderProgram, { Shader } from './rendering/gl/ShaderProgram';
 
 import Turtle from './lsystem/Turtle';
+import LSystem from './lsystem/LSystem';
+import ExpansionRule from './lsystem/ExpansionRule';
+import { readTextFile } from './globals';
+import Mesh from './geometry/Mesh';
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {};
 
+// Init LSystem
+let lsystem: LSystem = new LSystem(); //new ExpansionRule(controls));
+
 let square: Square;
 let screenQuad: ScreenQuad;
+let cylinder: Mesh;
+let sphere: Mesh;
+
 let time: number = 0.0;
 
 function loadScene() {
@@ -24,6 +34,10 @@ function loadScene() {
   screenQuad = new ScreenQuad();
   screenQuad.create();
 
+  //load from obj
+  let cylinderObj: string = readTextFile('./src/obj/cylinder.obj');
+  cylinder = new Mesh(cylinderObj, vec3.fromValues(0, 0, 0));
+  cylinder.create();
   // Set up instanced rendering data arrays here.
   // This example creates a set of positional
   // offsets and gradiated colors for a 100x100 grid
@@ -48,6 +62,9 @@ function loadScene() {
   let colors: Float32Array = new Float32Array(colorsArray);
   square.setInstanceVBOs(offsets, colors);
   square.setNumInstances(n * n); // grid of "particles"
+
+  // cylinder.setInstanceVBOsTransform(offsets, colors);
+  cylinder.setNumInstances(1); // grid of "particles"
 }
 
 function main() {
@@ -75,7 +92,7 @@ function main() {
   // Initial call to load scene
   loadScene();
 
-  const camera = new Camera(vec3.fromValues(50, 50, 10), vec3.fromValues(50, 50, 0));
+  const camera = new Camera(vec3.fromValues(15, 20, 100), vec3.fromValues(15, 25, 0));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.2, 0.2, 0.2, 1);
@@ -100,8 +117,11 @@ function main() {
     flat.setTime(time++);
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
-    renderer.render(camera, flat, [screenQuad]);
-    renderer.render(camera, instancedShader, [square]);
+    renderer.render(camera, flat, [
+      screenQuad,
+      // cylinder,
+    ]);
+    renderer.render(camera, instancedShader, [square, cylinder]);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame

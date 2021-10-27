@@ -1,4 +1,5 @@
 import { vec3, vec4, mat4 } from 'gl-matrix';
+// import { fromValues } from 'gl-matrix/src/gl-matrix/vec2';
 
 class Turtle {
   pos: vec3 = vec3.create();
@@ -8,7 +9,7 @@ class Turtle {
   depth: number = 0;
   stepSize: number = 1;
 
-  constructor(pos: vec3, up: vec3, right: vec3, forward: vec3) {
+  constructor(pos: vec3 = vec3.fromValues(0, 0, 0), up: vec3 = vec3.fromValues(0, 1, 0), right: vec3, forward: vec3) {
     this.pos = pos;
     this.up = up;
     this.right = right;

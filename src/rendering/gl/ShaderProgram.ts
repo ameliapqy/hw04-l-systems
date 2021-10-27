@@ -1,6 +1,6 @@
-import {vec3, vec4, mat4, mat3} from 'gl-matrix';
+import { vec3, vec4, mat4, mat3 } from 'gl-matrix';
 import Drawable from './Drawable';
-import {gl} from '../../globals';
+import { gl } from '../../globals';
 
 var activeProgram: WebGLProgram = null;
 
@@ -16,7 +16,7 @@ export class Shader {
       throw gl.getShaderInfoLog(this.shader);
     }
   }
-};
+}
 
 class ShaderProgram {
   prog: WebGLProgram;
@@ -48,18 +48,19 @@ class ShaderProgram {
       throw gl.getProgramInfoLog(this.prog);
     }
 
-    this.attrPos = gl.getAttribLocation(this.prog, "vs_Pos");
-    this.attrCol = gl.getAttribLocation(this.prog, "vs_Col");
-    this.attrTranslate = gl.getAttribLocation(this.prog, "vs_Translate");
-    this.attrUV = gl.getAttribLocation(this.prog, "vs_UV");
-    this.unifModel      = gl.getUniformLocation(this.prog, "u_Model");
-    this.unifModelInvTr = gl.getUniformLocation(this.prog, "u_ModelInvTr");
-    this.unifViewProj   = gl.getUniformLocation(this.prog, "u_ViewProj");
-    this.unifCameraAxes      = gl.getUniformLocation(this.prog, "u_CameraAxes");
-    this.unifTime      = gl.getUniformLocation(this.prog, "u_Time");
-    this.unifEye   = gl.getUniformLocation(this.prog, "u_Eye");
-    this.unifRef   = gl.getUniformLocation(this.prog, "u_Ref");
-    this.unifUp   = gl.getUniformLocation(this.prog, "u_Up");
+    this.attrPos = gl.getAttribLocation(this.prog, 'vs_Pos');
+    this.attrCol = gl.getAttribLocation(this.prog, 'vs_Col');
+    this.attrNor = gl.getAttribLocation(this.prog, 'vs_Nor');
+    this.attrTranslate = gl.getAttribLocation(this.prog, 'vs_Translate');
+    this.attrUV = gl.getAttribLocation(this.prog, 'vs_UV');
+    this.unifModel = gl.getUniformLocation(this.prog, 'u_Model');
+    this.unifModelInvTr = gl.getUniformLocation(this.prog, 'u_ModelInvTr');
+    this.unifViewProj = gl.getUniformLocation(this.prog, 'u_ViewProj');
+    this.unifCameraAxes = gl.getUniformLocation(this.prog, 'u_CameraAxes');
+    this.unifTime = gl.getUniformLocation(this.prog, 'u_Time');
+    this.unifEye = gl.getUniformLocation(this.prog, 'u_Eye');
+    this.unifRef = gl.getUniformLocation(this.prog, 'u_Ref');
+    this.unifUp = gl.getUniformLocation(this.prog, 'u_Up');
   }
 
   use() {
@@ -71,20 +72,20 @@ class ShaderProgram {
 
   setEyeRefUp(eye: vec3, ref: vec3, up: vec3) {
     this.use();
-    if(this.unifEye !== -1) {
+    if (this.unifEye !== -1) {
       gl.uniform3f(this.unifEye, eye[0], eye[1], eye[2]);
     }
-    if(this.unifRef !== -1) {
+    if (this.unifRef !== -1) {
       gl.uniform3f(this.unifRef, ref[0], ref[1], ref[2]);
     }
-    if(this.unifUp !== -1) {
+    if (this.unifUp !== -1) {
       gl.uniform3f(this.unifUp, up[0], up[1], up[2]);
     }
   }
 
   setDimensions(width: number, height: number) {
     this.use();
-    if(this.unifDimensions !== -1) {
+    if (this.unifDimensions !== -1) {
       gl.uniform2f(this.unifDimensions, width, height);
     }
   }
@@ -179,6 +180,6 @@ class ShaderProgram {
     if (this.attrTranslate != -1) gl.disableVertexAttribArray(this.attrTranslate);
     if (this.attrUV != -1) gl.disableVertexAttribArray(this.attrUV);
   }
-};
+}
 
 export default ShaderProgram;
