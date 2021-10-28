@@ -18,3 +18,7 @@ export function readTextFile(file: string): string {
   rawFile.send(null);
   return text;
 }
+
+export function toRadian(angle: number) {
+  return (angle * Math.PI) / 180.0;
+}

@@ -3,18 +3,45 @@
 
 //maintain a quaternion/ forward right
 class ExpansionRule {
-  precondition: string;
-  postcondition: Map<string, any>; //<probability, new symbol>
+  grammar: Map<string, any>; //<char to new char> //<probability, new symbol>
+  string: string;
+  axiom: any;
   controls: any;
 
   constructor(controls: any) {
-    this.precondition = 'F';
-    this.postcondition = new Map();
-    this.postcondition.set('F', this.expandTrunk);
+    this.axiom = 'X';
+    this.grammar = new Map();
+    this.grammar.set('F', this.expandF());
+    this.grammar.set('X', this.expandX());
   }
 
-  expandTrunk() {
+  //F = FF
+  expandF() {
     return 'FF';
+  }
+
+  //X = +F+F-[[X]+X]+F[+FX]-X
+  expandX() {
+    return '+F+F-[[X]+X]+F[+FX]-X';
+  }
+
+  expandAxiom(iter: number) {
+    let result: string = this.axiom;
+
+    for (let i = 0; i < iter; i++) {
+      let curr: string = '';
+      for (let old_sym of result) {
+        let func = this.grammar.get(old_sym);
+        if (func) {
+          curr += func();
+        } else {
+          curr += old_sym;
+        }
+      }
+      result = curr;
+    }
+
+    return result;
   }
 }
 

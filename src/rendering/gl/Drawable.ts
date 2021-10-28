@@ -1,4 +1,4 @@
-import {gl} from '../../globals';
+import { gl } from '../../globals';
 
 abstract class Drawable {
   count: number = 0;
@@ -10,16 +10,22 @@ abstract class Drawable {
   bufCol: WebGLBuffer;
   bufUV: WebGLBuffer;
 
+  //new buffers
+  bufQuat: WebGLBuffer;
+  bufScale: WebGLBuffer;
+
   idxGenerated: boolean = false;
   posGenerated: boolean = false;
   norGenerated: boolean = false;
   colGenerated: boolean = false;
   translateGenerated: boolean = false;
   uvGenerated: boolean = false;
+  quatGenerated: boolean = false;
+  scaleGenerated: boolean = false;
 
   numInstances: number = 0; // How many instances of this Drawable the shader program should draw
 
-  abstract create() : void;
+  abstract create(): void;
 
   destory() {
     gl.deleteBuffer(this.bufIdx);
@@ -28,6 +34,8 @@ abstract class Drawable {
     gl.deleteBuffer(this.bufCol);
     gl.deleteBuffer(this.bufTranslate);
     gl.deleteBuffer(this.bufUV);
+    gl.deleteBuffer(this.bufQuat);
+    gl.deleteBuffer(this.bufScale);
   }
 
   generateIdx() {
@@ -58,6 +66,16 @@ abstract class Drawable {
   generateUV() {
     this.uvGenerated = true;
     this.bufUV = gl.createBuffer();
+  }
+
+  generateQuat() {
+    this.quatGenerated = true;
+    this.bufQuat = gl.createBuffer();
+  }
+
+  generateScale() {
+    this.scaleGenerated = true;
+    this.bufScale = gl.createBuffer();
   }
 
   bindIdx(): boolean {
@@ -102,6 +120,20 @@ abstract class Drawable {
     return this.uvGenerated;
   }
 
+  bindQuat(): boolean {
+    if (this.quatGenerated) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.bufQuat);
+    }
+    return this.quatGenerated;
+  }
+
+  bindScale(): boolean {
+    if (this.scaleGenerated) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.bufScale);
+    }
+    return this.scaleGenerated;
+  }
+
   elemCount(): number {
     return this.count;
   }
@@ -113,6 +145,6 @@ abstract class Drawable {
   setNumInstances(num: number) {
     this.numInstances = num;
   }
-};
+}
 
 export default Drawable;

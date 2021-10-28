@@ -11,12 +11,16 @@ import ShaderProgram, { Shader } from './rendering/gl/ShaderProgram';
 import Turtle from './lsystem/Turtle';
 import LSystem from './lsystem/LSystem';
 import ExpansionRule from './lsystem/ExpansionRule';
-import { readTextFile } from './globals';
+import { readTextFile, toRadian } from './globals';
 import Mesh from './geometry/Mesh';
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
-const controls = {};
+const controls = {
+  iterations: 3,
+  angle: 30,
+  flower_color: [255, 130, 90],
+};
 
 // Init LSystem
 let lsystem: LSystem = new LSystem(); //new ExpansionRule(controls));
@@ -38,13 +42,25 @@ function loadScene() {
   let cylinderObj: string = readTextFile('./src/obj/cylinder.obj');
   cylinder = new Mesh(cylinderObj, vec3.fromValues(0, 0, 0));
   cylinder.create();
+
+  //lsystem
+  lsystem.draw();
+  let trunksTransform = lsystem.drawingRule.trunks;
+
+  //update vbo
+  cylinder.setInstanceVBOTransform(
+    new Float32Array(trunksTransform.trans),
+    new Float32Array(trunksTransform.quat),
+    new Float32Array(trunksTransform.scale)
+  );
+  cylinder.setNumInstances(trunksTransform.count);
   // Set up instanced rendering data arrays here.
   // This example creates a set of positional
   // offsets and gradiated colors for a 100x100 grid
   // of squares, even though the VBO data for just
   // one square is actually passed to the GPU
-  let offsetsArray = [];
-  let colorsArray = [];
+  let offsetsArray = [1, 1, 1, 1];
+  let colorsArray = [1, 1, 1, 1];
   let n: number = 100.0;
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < n; j++) {
@@ -63,8 +79,13 @@ function loadScene() {
   square.setInstanceVBOs(offsets, colors);
   square.setNumInstances(n * n); // grid of "particles"
 
-  // cylinder.setInstanceVBOsTransform(offsets, colors);
-  cylinder.setNumInstances(1); // grid of "particles"
+  cylinder.setInstanceVBOs(offsets, colors);
+  cylinder.setNumInstances(2);
+}
+
+function instanceRrendering() {
+  //if (changed) {
+  //}
 }
 
 function main() {
@@ -92,12 +113,13 @@ function main() {
   // Initial call to load scene
   loadScene();
 
-  const camera = new Camera(vec3.fromValues(15, 20, 100), vec3.fromValues(15, 25, 0));
+  const camera = new Camera(vec3.fromValues(0, 0, 50), vec3.fromValues(0, 0, 0));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.2, 0.2, 0.2, 1);
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.ONE, gl.ONE); // Additive blending
+  // gl.enable(gl.BLEND);
+  // gl.blendFunc(gl.ONE, gl.ONE); // Additive blending
+  gl.enable(gl.DEPTH_TEST);
 
   const instancedShader = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/instanced-vert.glsl')),
@@ -116,12 +138,14 @@ function main() {
     instancedShader.setTime(time);
     flat.setTime(time++);
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
+    //set LSystem Up
+
     renderer.clear();
-    renderer.render(camera, flat, [
-      screenQuad,
-      // cylinder,
+    renderer.render(camera, flat, [screenQuad]);
+    renderer.render(camera, instancedShader, [
+      //square,
+      cylinder,
     ]);
-    renderer.render(camera, instancedShader, [square, cylinder]);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
