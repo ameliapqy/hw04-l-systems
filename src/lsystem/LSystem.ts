@@ -34,7 +34,7 @@ class LSystem {
     //set up instance VBOs
     let trunksTransform = this.drawingRule.trunks;
     //update vbo
-    this.cylinder.setInstanceVBOTransform(
+    this.cylinder.setInstanceVBOsTransform2(
       new Float32Array(trunksTransform.trans),
       new Float32Array(trunksTransform.quat),
       new Float32Array(trunksTransform.scale)

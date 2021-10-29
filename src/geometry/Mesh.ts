@@ -12,6 +12,11 @@ class Mesh extends Drawable {
   center: vec4;
   offsets: Float32Array;
 
+  col1: Float32Array;
+  col2: Float32Array;
+  col3: Float32Array;
+  col4: Float32Array;
+
   objString: string;
 
   // instance transform
@@ -85,6 +90,26 @@ class Mesh extends Drawable {
     this.objString = ''; // hacky clear
   }
 
+  setInstanceVBOsTransform(colors: Float32Array, col1: Float32Array, col2: Float32Array, col3: Float32Array, col4: Float32Array) {
+    this.colors = colors;
+    this.col1 = col1;
+    this.col2 = col2;
+    this.col3 = col3;
+    this.col4 = col4;
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol1);
+    gl.bufferData(gl.ARRAY_BUFFER, this.col1, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol2);
+    gl.bufferData(gl.ARRAY_BUFFER, this.col2, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol3);
+    gl.bufferData(gl.ARRAY_BUFFER, this.col3, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol4);
+    gl.bufferData(gl.ARRAY_BUFFER, this.col4, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
+    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
+  }
+
   setInstanceVBOs(offsets: Float32Array, colors: Float32Array) {
     this.colors = colors;
     this.offsets = offsets;
@@ -95,7 +120,7 @@ class Mesh extends Drawable {
     gl.bufferData(gl.ARRAY_BUFFER, this.offsets, gl.STATIC_DRAW);
   }
 
-  setInstanceVBOTransform(trans: Float32Array, quat: Float32Array, scale: Float32Array) {
+  setInstanceVBOsTransform2(trans: Float32Array, quat: Float32Array, scale: Float32Array) {
     this.trans = trans;
     this.quat = quat;
     this.scale = scale;

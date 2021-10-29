@@ -2,27 +2,41 @@
 
 ## Objective
 
-- Gain experience with signed distance functions
-- Experiment with animation curves
+- Design a set of formal grammar rules to create a plant life using an L-system program
+- Implement your own set of classes to handle the L-system grammar expansion and drawing
+- Rasterized L-system using faceted geometry
 
 ## Techniques
 
-lsystem: ![](lsystem.png)
+Collection of classes to represent an L-system
+
+- created `Turtle, ExpansionRule, DrawingRule`, and `LSystem` class inside the lsystem folder
+
+Instanced rendering
+
+- Set up the code in `main.ts` and `ShaderProgram.ts` to pass a collection of transformation data to the GPU to draw L-System geometric components
+- Created `setInstanceVBOTransform` function inside mesh class to pass transform data for instance rendering
+
+Lsystem scene progress:
+
+lsystem experimentation with turtle renderer: ![](lsystem.png)
 
 - using https://kevs3d.co.uk/dev/lsystems/ to experiment with the lsystem grammar
 
-houdini tree: ![](htree.png)
+houdini tree: ![](htree1.jpg) ![](htree2.jpg)
 
 - experimenting with houdini
 
 progress1: ![](progress1.png)
+
 - cylinder shows up
 
 progress2: ![](progress2.png)
+
 - coded a background with fbm noise
+- imported a costumized star obj as the flower
 
-
-
+next steps: unable to complete the lsystem due to illness ;-; will try to make it work in the future!
 
 ## General Information
 

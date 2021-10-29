@@ -10,6 +10,11 @@ abstract class Drawable {
   bufCol: WebGLBuffer;
   bufUV: WebGLBuffer;
 
+  bufCol1: WebGLBuffer;
+  bufCol2: WebGLBuffer;
+  bufCol3: WebGLBuffer;
+  bufCol4: WebGLBuffer;
+
   //new buffers
   bufQuat: WebGLBuffer;
   bufScale: WebGLBuffer;
@@ -18,6 +23,11 @@ abstract class Drawable {
   posGenerated: boolean = false;
   norGenerated: boolean = false;
   colGenerated: boolean = false;
+  col1Generated: boolean = false;
+  col2Generated: boolean = false;
+  col3Generated: boolean = false;
+  col4Generated: boolean = false;
+
   translateGenerated: boolean = false;
   uvGenerated: boolean = false;
   quatGenerated: boolean = false;
@@ -33,6 +43,10 @@ abstract class Drawable {
     gl.deleteBuffer(this.bufNor);
     gl.deleteBuffer(this.bufCol);
     gl.deleteBuffer(this.bufTranslate);
+    gl.deleteBuffer(this.bufCol1);
+    gl.deleteBuffer(this.bufCol2);
+    gl.deleteBuffer(this.bufCol3);
+    gl.deleteBuffer(this.bufCol4);
     gl.deleteBuffer(this.bufUV);
     gl.deleteBuffer(this.bufQuat);
     gl.deleteBuffer(this.bufScale);
@@ -56,6 +70,26 @@ abstract class Drawable {
   generateCol() {
     this.colGenerated = true;
     this.bufCol = gl.createBuffer();
+  }
+
+  generateCol1() {
+    this.col1Generated = true;
+    this.bufCol1 = gl.createBuffer();
+  }
+
+  generateCol2() {
+    this.col2Generated = true;
+    this.bufCol2 = gl.createBuffer();
+  }
+
+  generateCol3() {
+    this.col3Generated = true;
+    this.bufCol3 = gl.createBuffer();
+  }
+
+  generateCol4() {
+    this.col4Generated = true;
+    this.bufCol4 = gl.createBuffer();
   }
 
   generateTranslate() {

@@ -1,4 +1,4 @@
-import { vec3 } from 'gl-matrix';
+import { vec3, vec4 } from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
 import Square from './geometry/Square';
@@ -51,21 +51,62 @@ function loadScene() {
   lsystem.draw();
   let trunksTransform = lsystem.drawingRule.trunks;
 
-  //update vbo
-  cylinder.setInstanceVBOTransform(
-    new Float32Array(trunksTransform.trans),
-    new Float32Array(trunksTransform.quat),
-    new Float32Array(trunksTransform.scale)
-  );
-  cylinder.setNumInstances(trunksTransform.count);
+  let colorsArray1 = [];
+
+  let col1sArray = [1, 0, 0, 0];
+  let col2sArray = [0, 1, 0, 0];
+  let col3sArray = [0, 0, 1, 0];
+  let col4sArray = [10, 10, 10, 1];
+
+  // col1sArray.push(transformation[0]);
+  // col1sArray.push(transformation[1]);
+  // col1sArray.push(transformation[2]);
+  // col1sArray.push(transformation[3]);
+
+  // col2sArray.push(transformation[4]);
+  // col2sArray.push(transformation[5]);
+  // col2sArray.push(transformation[6]);
+  // col2sArray.push(transformation[7]);
+
+  // col3sArray.push(transformation[8]);
+  // col3sArray.push(transformation[9]);
+  // col3sArray.push(transformation[10]);
+  // col3sArray.push(transformation[11]);
+
+  // col4sArray.push(transformation[12]);
+  // col4sArray.push(transformation[13]);
+  // col4sArray.push(transformation[14]);
+  // col4sArray.push(1);
+
+  colorsArray1.push(0.3);
+  colorsArray1.push(0.2);
+  colorsArray1.push(0.1);
+  colorsArray1.push(1.0); // Alpha channel
+
+  let colors1: Float32Array = new Float32Array(colorsArray1);
+  let col1s: Float32Array = new Float32Array(col1sArray);
+  let col2s: Float32Array = new Float32Array(col2sArray);
+  let col3s: Float32Array = new Float32Array(col3sArray);
+  let col4s: Float32Array = new Float32Array(col4sArray);
+
+  cylinder.setInstanceVBOs(colors1, col1s, col2s, col3s, col4s);
+
+  // //update vbo
+  // cylinder.setInstanceVBOTransform2(
+  //   new Float32Array(trunksTransform.trans),
+  //   new Float32Array(trunksTransform.quat),
+  //   new Float32Array(trunksTransform.scale)
+  // );
+
+  cylinder.setNumInstances(5);
 
   let flowersTransform = lsystem.drawingRule.flowers;
-  star.setInstanceVBOTransform(
-    new Float32Array(trunksTransform.trans),
-    new Float32Array(trunksTransform.quat),
-    new Float32Array(trunksTransform.scale)
-  );
-  star.setNumInstances(trunksTransform.count);
+  // star.setInstanceVBOTransform2(
+  //   new Float32Array(trunksTransform.trans),
+  //   new Float32Array(trunksTransform.quat),
+  //   new Float32Array(trunksTransform.scale)
+  // );
+  // star.setNumInstances(trunksTransform.count);
 
   // Set up instanced rendering data arrays here.
   // This example creates a set of positional
@@ -157,7 +198,7 @@ function main() {
     renderer.render(camera, flat, [screenQuad]);
     renderer.render(camera, instancedShader, [
       // square,
-      // cylinder,
+      cylinder,
       star,
     ]);
     stats.end();
