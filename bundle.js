@@ -262,6 +262,10 @@ class Drawable {
         this.posGenerated = false;
         this.norGenerated = false;
         this.colGenerated = false;
+        this.col1Generated = false;
+        this.col2Generated = false;
+        this.col3Generated = false;
+        this.col4Generated = false;
         this.translateGenerated = false;
         this.uvGenerated = false;
         this.quatGenerated = false;
@@ -274,6 +278,10 @@ class Drawable {
         __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufNor);
         __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufCol);
         __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufTranslate);
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufCol1);
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufCol2);
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufCol3);
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufCol4);
         __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufUV);
         __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufQuat);
         __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufScale);
@@ -293,6 +301,22 @@ class Drawable {
     generateCol() {
         this.colGenerated = true;
         this.bufCol = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+    }
+    generateCol1() {
+        this.col1Generated = true;
+        this.bufCol1 = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+    }
+    generateCol2() {
+        this.col2Generated = true;
+        this.bufCol2 = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+    }
+    generateCol3() {
+        this.col3Generated = true;
+        this.bufCol3 = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+    }
+    generateCol4() {
+        this.col4Generated = true;
+        this.bufCol4 = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
     }
     generateTranslate() {
         this.translateGenerated = true;
@@ -6101,6 +6125,23 @@ class Mesh extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
         console.log(`Created Mesh from OBJ`);
         this.objString = ''; // hacky clear
     }
+    setInstanceVBOsTransform(colors, col1, col2, col3, col4) {
+        this.colors = colors;
+        this.col1 = col1;
+        this.col2 = col2;
+        this.col3 = col3;
+        this.col4 = col4;
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.bufCol1);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.col1, __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].STATIC_DRAW);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.bufCol2);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.col2, __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].STATIC_DRAW);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.bufCol3);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.col3, __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].STATIC_DRAW);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.bufCol4);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.col4, __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].STATIC_DRAW);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.bufCol);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.colors, __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].STATIC_DRAW);
+    }
     setInstanceVBOs(offsets, colors) {
         this.colors = colors;
         this.offsets = offsets;
@@ -6109,7 +6150,7 @@ class Mesh extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
         __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.bufTranslate);
         __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.offsets, __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].STATIC_DRAW);
     }
-    setInstanceVBOTransform(trans, quat, scale) {
+    setInstanceVBOsTransform2(trans, quat, scale) {
         this.trans = trans;
         this.quat = quat;
         this.scale = scale;
@@ -6188,12 +6229,51 @@ function loadScene() {
     let lsystem = new __WEBPACK_IMPORTED_MODULE_9__lsystem_LSystem__["a" /* default */](controls); //new ExpansionRule(controls));
     lsystem.draw();
     let trunksTransform = lsystem.drawingRule.trunks;
-    //update vbo
-    cylinder.setInstanceVBOTransform(new Float32Array(trunksTransform.trans), new Float32Array(trunksTransform.quat), new Float32Array(trunksTransform.scale));
-    cylinder.setNumInstances(trunksTransform.count);
+    let colorsArray1 = [];
+    let col1sArray = [1, 0, 0, 0];
+    let col2sArray = [0, 1, 0, 0];
+    let col3sArray = [0, 0, 1, 0];
+    let col4sArray = [10, 10, 10, 1];
+    // col1sArray.push(transformation[0]);
+    // col1sArray.push(transformation[1]);
+    // col1sArray.push(transformation[2]);
+    // col1sArray.push(transformation[3]);
+    // col2sArray.push(transformation[4]);
+    // col2sArray.push(transformation[5]);
+    // col2sArray.push(transformation[6]);
+    // col2sArray.push(transformation[7]);
+    // col3sArray.push(transformation[8]);
+    // col3sArray.push(transformation[9]);
+    // col3sArray.push(transformation[10]);
+    // col3sArray.push(transformation[11]);
+    // col4sArray.push(transformation[12]);
+    // col4sArray.push(transformation[13]);
+    // col4sArray.push(transformation[14]);
+    // col4sArray.push(1);
+    colorsArray1.push(0.3);
+    colorsArray1.push(0.2);
+    colorsArray1.push(0.1);
+    colorsArray1.push(1.0); // Alpha channel
+    let colors1 = new Float32Array(colorsArray1);
+    let col1s = new Float32Array(col1sArray);
+    let col2s = new Float32Array(col2sArray);
+    let col3s = new Float32Array(col3sArray);
+    let col4s = new Float32Array(col4sArray);
+    cylinder.setInstanceVBOsTransform(colors1, col1s, col2s, col3s, col4s);
+    // //update vbo
+    // cylinder.setInstanceVBOTransform2(
+    //   new Float32Array(trunksTransform.trans),
+    //   new Float32Array(trunksTransform.quat),
+    //   new Float32Array(trunksTransform.scale)
+    // );
+    cylinder.setNumInstances(5);
     let flowersTransform = lsystem.drawingRule.flowers;
-    star.setInstanceVBOTransform(new Float32Array(trunksTransform.trans), new Float32Array(trunksTransform.quat), new Float32Array(trunksTransform.scale));
-    star.setNumInstances(trunksTransform.count);
+    // star.setInstanceVBOTransform2(
+    //   new Float32Array(trunksTransform.trans),
+    //   new Float32Array(trunksTransform.quat),
+    //   new Float32Array(trunksTransform.scale)
+    // );
+    // star.setNumInstances(trunksTransform.count);
     // Set up instanced rendering data arrays here.
     // This example creates a set of positional
     // offsets and gradiated colors for a 100x100 grid
@@ -6271,7 +6351,7 @@ function main() {
         renderer.render(camera, flat, [screenQuad]);
         renderer.render(camera, instancedShader, [
             // square,
-            // cylinder,
+            cylinder,
             star,
         ]);
         stats.end();
@@ -16720,7 +16800,7 @@ class LSystem {
         //set up instance VBOs
         let trunksTransform = this.drawingRule.trunks;
         //update vbo
-        this.cylinder.setInstanceVBOTransform(new Float32Array(trunksTransform.trans), new Float32Array(trunksTransform.quat), new Float32Array(trunksTransform.scale));
+        this.cylinder.setInstanceVBOsTransform2(new Float32Array(trunksTransform.trans), new Float32Array(trunksTransform.quat), new Float32Array(trunksTransform.scale));
         this.cylinder.setNumInstances(trunksTransform.count);
         console.log(trunksTransform.count);
     }
@@ -16934,7 +17014,7 @@ class Turtle {
 /* 75 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\nuniform mat4 u_ViewProj;\nuniform float u_Time;\n\nuniform mat3 u_CameraAxes; // Used for rendering particles as billboards (quads that are always looking at the camera)\n// gl_Position = center + vs_Pos.x * camRight + vs_Pos.y * camUp;\n\nin vec4 vs_Pos; // Non-instanced; each particle is the same quad drawn in a different place\nin vec4 vs_Nor; // Non-instanced, and presently unused\nin vec4 vs_Col; // An instanced rendering attribute; each particle instance has a different color\nin vec3 vs_Translate; // Another instance rendering attribute used to position each quad instance in the scene\nin vec2 vs_UV; // Non-instanced, and presently unused in main(). Feel free to use it for your meshes.\n\nout vec4 fs_Col;\nout vec4 fs_Pos;\nout vec4 fs_Nor;\n\nvoid main()\n{\n    fs_Col = vs_Col;\n    fs_Pos = vs_Pos;\n    fs_Nor = vs_Nor;\n\n    // vec3 offset = vs_Translate;\n    // offset.z = (sin((u_Time + offset.x) * 3.14159 * 0.1) + cos((u_Time + offset.y) * 3.14159 * 0.1)) * 1.5;\n\n    // vec3 billboardPos = offset + vs_Pos.x * u_CameraAxes[0] + vs_Pos.y * u_CameraAxes[1];\n\n    gl_Position = u_ViewProj * vs_Pos;//* vec4(billboardPos, 1.0);\n}\n"
+module.exports = "#version 300 es\n\nuniform mat4 u_ViewProj;\nuniform float u_Time;\n\nuniform mat3 u_CameraAxes; // Used for rendering particles as billboards (quads that are always looking at the camera)\n// gl_Position = center + vs_Pos.x * camRight + vs_Pos.y * camUp;\n\nin vec4 vs_Pos; // Non-instanced; each particle is the same quad drawn in a different place\nin vec4 vs_Nor; // Non-instanced, and presently unused\nin vec4 vs_Col; // An instanced rendering attribute; each particle instance has a different color\nin vec3 vs_Translate; // Another instance rendering attribute used to position each quad instance in the scene\nin vec2 vs_UV; // Non-instanced, and presently unused in main(). Feel free to use it for your meshes.\n\nin vec4 vs_Transform1; // Another instance rendering attribute used to position each quad instance in the scene\nin vec4 vs_Transform2; // Another instance rendering attribute used to position each quad instance in the scene\nin vec4 vs_Transform3; // Another instance rendering attribute used to position each quad instance in the scene\nin vec4 vs_Transform4; // Another instance rendering attribute used to position each quad instance in the scene\n\nout vec4 fs_Col;\nout vec4 fs_Pos;\nout vec4 fs_Nor;\n\nvoid main()\n{\n    fs_Col = vs_Col;\n    fs_Pos = vs_Pos;\n    fs_Nor = vs_Nor;\n\n    vec3 offset = vs_Translate;\n    // offset.z = (sin((u_Time + offset.x) * 3.14159 * 0.1) + cos((u_Time + offset.y) * 3.14159 * 0.1)) * 1.5;\n\n    // vec3 billboardPos = offset + vs_Pos.x * u_CameraAxes[0] + vs_Pos.y * u_CameraAxes[1];\n    mat4 transformation = mat4(vs_Transform1, vs_Transform2, vs_Transform3, vs_Transform4);\n    vec4 instancedPos = transformation * vs_Pos;\n    gl_Position = u_ViewProj * vec4(instancedPos.xyz, 1.0);\n    // gl_Position = u_ViewProj * vs_Pos;//* vec4(billboardPos, 1.0);\n}\n"
 
 /***/ }),
 /* 76 */
