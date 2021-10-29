@@ -35,7 +35,7 @@ class DrawingRule {
     this.turtleStack.push(this.turtle);
     //set up drawing rules
     this.rules.set('F', this.drawTrunk.bind(this));
-    this.rules.set('X', this.drawTrunk.bind(this));
+    this.rules.set('X', this.drawFlowers.bind(this));
     this.rules.set('[', this.presave.bind(this));
     this.rules.set(']', this.save.bind(this));
 
@@ -77,6 +77,17 @@ class DrawingRule {
     this.trunks.scale.push(t.scale[0], t.scale[1], t.scale[2]);
     this.trunks.quat.push(t.quaternion[0], t.quaternion[1], t.quaternion[2]);
     this.trunks.count += 1;
+    t.moveForward();
+  }
+
+  drawFlowers() {
+    let t = this.turtle;
+    //roatet cylinder so it faces forward
+    t.rotateAngleAxis(this.toRadian(90.0), t.up);
+    this.flowers.trans.push(t.pos[0], t.pos[1], t.pos[2]);
+    this.flowers.scale.push(t.scale[0], t.scale[1], t.scale[2]);
+    this.flowers.quat.push(t.quaternion[0], t.quaternion[1], t.quaternion[2]);
+    this.flowers.count += 1;
     t.moveForward();
   }
 }

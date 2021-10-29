@@ -25,6 +25,7 @@ const controls = {
 let square: Square;
 let screenQuad: ScreenQuad;
 let cylinder: Mesh;
+let star: Mesh;
 let sphere: Mesh;
 
 let time: number = 0.0;
@@ -40,6 +41,10 @@ function loadScene() {
   cylinder = new Mesh(cylinderObj, vec3.fromValues(0, 0, 0));
   cylinder.create();
 
+  let starObj: string = readTextFile('./src/obj/star.obj');
+  star = new Mesh(starObj, vec3.fromValues(0, 10, 0));
+  star.create();
+
   //lsystem
   // Init LSystem
   let lsystem: LSystem = new LSystem(controls); //new ExpansionRule(controls));
@@ -53,6 +58,15 @@ function loadScene() {
     new Float32Array(trunksTransform.scale)
   );
   cylinder.setNumInstances(trunksTransform.count);
+
+  let flowersTransform = lsystem.drawingRule.flowers;
+  star.setInstanceVBOTransform(
+    new Float32Array(trunksTransform.trans),
+    new Float32Array(trunksTransform.quat),
+    new Float32Array(trunksTransform.scale)
+  );
+  star.setNumInstances(trunksTransform.count);
+
   // Set up instanced rendering data arrays here.
   // This example creates a set of positional
   // offsets and gradiated colors for a 100x100 grid
@@ -142,9 +156,9 @@ function main() {
     renderer.clear();
     renderer.render(camera, flat, [screenQuad]);
     renderer.render(camera, instancedShader, [
-      //square,
+      // square,
       // cylinder,
-      cylinder,
+      star,
     ]);
     stats.end();
 

@@ -29,7 +29,7 @@ class LSystem {
     //  let expandedStr = this.expansionRule.string;
     // this.drawingRule.draw(expandedStr);
     console.log(this.drawingRule);
-    this.drawingRule.draw('FFF');
+    this.drawingRule.draw('FFFX');
 
     //set up instance VBOs
     let trunksTransform = this.drawingRule.trunks;
