@@ -89,7 +89,7 @@ function loadScene() {
   let col3s: Float32Array = new Float32Array(col3sArray);
   let col4s: Float32Array = new Float32Array(col4sArray);
 
-  cylinder.setInstanceVBOs(colors1, col1s, col2s, col3s, col4s);
+  cylinder.setInstanceVBOsTransform(colors1, col1s, col2s, col3s, col4s);
 
   // //update vbo
   // cylinder.setInstanceVBOTransform2(
