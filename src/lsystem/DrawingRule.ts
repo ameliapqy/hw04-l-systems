@@ -26,7 +26,7 @@ class DrawingRule {
       vec3.fromValues(0, 0, 0), //pos
       vec3.fromValues(0, 1, 0), //up
       vec3.fromValues(1, 0, 0), //right
-      vec3.fromValues(0, 1, 0), //forward
+      vec3.fromValues(0, 10, 0), //forward
       vec3.fromValues(1, 1, 1), //scale
       quat.fromValues(0, 1, 0, 0), //quat
       3, //recursion depth
@@ -34,11 +34,26 @@ class DrawingRule {
     );
     this.turtleStack.push(this.turtle);
     //set up drawing rules
-    this.rules.set('F', this.turtle.moveForward.bind(this.turtle));
+    this.rules.set('F', this.drawTrunk.bind(this));
+    this.rules.set('X', this.drawTrunk.bind(this));
+    this.rules.set('[', this.presave.bind(this));
+    this.rules.set(']', this.save.bind(this));
+
     this.rules.set('X', this.turtle.moveForward.bind(this.turtle));
 
     this.rules.set('+', this.turtle.rotatePos.bind(this.turtle));
     this.rules.set('-', this.turtle.rotateNeg.bind(this.turtle));
+  }
+  //[
+  presave() {
+    this.turtleStack.push(this.turtle);
+    let newt = this.turtle.copy();
+    newt.depth = this.turtle.depth + 1;
+    this.turtle = newt;
+  }
+  //]
+  save() {
+    this.turtleStack.pop();
   }
 
   draw(grammar: string) {

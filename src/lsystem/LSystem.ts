@@ -29,7 +29,7 @@ class LSystem {
     //  let expandedStr = this.expansionRule.string;
     // this.drawingRule.draw(expandedStr);
     console.log(this.drawingRule);
-    this.drawingRule.draw('FF');
+    this.drawingRule.draw('FFF');
 
     //set up instance VBOs
     let trunksTransform = this.drawingRule.trunks;
@@ -40,6 +40,7 @@ class LSystem {
       new Float32Array(trunksTransform.scale)
     );
     this.cylinder.setNumInstances(trunksTransform.count);
+    console.log(trunksTransform.count);
   }
 }
 

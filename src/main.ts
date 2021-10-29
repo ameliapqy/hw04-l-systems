@@ -78,8 +78,8 @@ function loadScene() {
   square.setInstanceVBOs(offsets, colors);
   square.setNumInstances(n * n); // grid of "particles"
 
-  cylinder.setInstanceVBOs(offsets, colors);
-  cylinder.setNumInstances(2);
+  // cylinder.setInstanceVBOs(offsets, colors);
+  // cylinder.setNumInstances(1);
 }
 
 function instanceRrendering() {

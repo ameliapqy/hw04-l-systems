@@ -25,6 +25,11 @@ class Turtle {
     this.controls = controls;
   }
 
+  copy() {
+    let newt = new Turtle(this.pos, this.up, this.right, this.forward, this.scale, this.quaternion, this.depth, this.controls);
+    return newt;
+  }
+
   moveForward() {
     vec3.scaleAndAdd(this.pos, this.pos, this.forward, this.stepSize);
   }
@@ -32,6 +37,7 @@ class Turtle {
   rotatePos() {
     this.rotateAngleAxis(this.deg, this.forward);
   }
+  
   rotateNeg() {
     this.rotateAngleAxis(-this.deg, this.forward);
   }
