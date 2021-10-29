@@ -6210,8 +6210,8 @@ function loadScene() {
     let colors = new Float32Array(colorsArray);
     square.setInstanceVBOs(offsets, colors);
     square.setNumInstances(n * n); // grid of "particles"
-    cylinder.setInstanceVBOs(offsets, colors);
-    cylinder.setNumInstances(2);
+    // cylinder.setInstanceVBOs(offsets, colors);
+    // cylinder.setNumInstances(1);
 }
 function instanceRrendering() {
     //if (changed) {
@@ -16709,12 +16709,13 @@ class LSystem {
         //  let expandedStr = this.expansionRule.string;
         // this.drawingRule.draw(expandedStr);
         console.log(this.drawingRule);
-        this.drawingRule.draw('FF');
+        this.drawingRule.draw('FFF');
         //set up instance VBOs
         let trunksTransform = this.drawingRule.trunks;
         //update vbo
         this.cylinder.setInstanceVBOTransform(new Float32Array(trunksTransform.trans), new Float32Array(trunksTransform.quat), new Float32Array(trunksTransform.scale));
         this.cylinder.setNumInstances(trunksTransform.count);
+        console.log(trunksTransform.count);
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (LSystem);
@@ -16795,7 +16796,7 @@ class DrawingRule {
         this.turtle = new __WEBPACK_IMPORTED_MODULE_1__Turtle__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0), //pos
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 1, 0), //up
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(1, 0, 0), //right
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 1, 0), //forward
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 10, 0), //forward
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(1, 1, 1), //scale
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].fromValues(0, 1, 0, 0), //quat
         3, //recursion depth
@@ -16803,10 +16804,24 @@ class DrawingRule {
         );
         this.turtleStack.push(this.turtle);
         //set up drawing rules
-        this.rules.set('F', this.turtle.moveForward.bind(this.turtle));
+        this.rules.set('F', this.drawTrunk.bind(this));
+        this.rules.set('X', this.drawTrunk.bind(this));
+        this.rules.set('[', this.presave.bind(this));
+        this.rules.set(']', this.save.bind(this));
         this.rules.set('X', this.turtle.moveForward.bind(this.turtle));
         this.rules.set('+', this.turtle.rotatePos.bind(this.turtle));
         this.rules.set('-', this.turtle.rotateNeg.bind(this.turtle));
+    }
+    //[
+    presave() {
+        this.turtleStack.push(this.turtle);
+        let newt = this.turtle.copy();
+        newt.depth = this.turtle.depth + 1;
+        this.turtle = newt;
+    }
+    //]
+    save() {
+        this.turtleStack.pop();
     }
     draw(grammar) {
         for (let c of grammar) {
@@ -16863,6 +16878,10 @@ class Turtle {
         this.depth = depth;
         this.controls = controls;
     }
+    copy() {
+        let newt = new Turtle(this.pos, this.up, this.right, this.forward, this.scale, this.quaternion, this.depth, this.controls);
+        return newt;
+    }
     moveForward() {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].scaleAndAdd(this.pos, this.pos, this.forward, this.stepSize);
     }
@@ -16916,7 +16935,7 @@ module.exports = "#version 300 es\nprecision highp float;\n\n// The vertex shade
 /* 78 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\nuniform vec3 u_Eye, u_Ref, u_Up;\nuniform vec2 u_Dimensions;\nuniform float u_Time;\n\nin vec2 fs_Pos;\nout vec4 out_Col;\n\nvoid main() {\n  out_Col = vec4(0.5 * (fs_Pos + vec2(1.0)), 0.0, 1.0);\n  out_Col += vec4(0.0,-0.5,0.5,1.0);\n}\n"
+module.exports = "#version 300 es\nprecision highp float;\n\nuniform vec3 u_Eye, u_Ref, u_Up;\nuniform vec2 u_Dimensions;\nuniform float u_Time;\n\nin vec2 fs_Pos;\nout vec4 out_Col;\n\n\n//toolbox functions\nfloat mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}\nvec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}\nvec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}\n\nfloat noise(vec3 p){\n    vec3 a = floor(p);\n    vec3 d = p - a;\n    d = d * d * (3.0 - 2.0 * d);\n\n    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);\n    vec4 k1 = perm(b.xyxy);\n    vec4 k2 = perm(k1.xyxy + b.zzww);\n\n    vec4 c = k2 + a.zzzz;\n    vec4 k3 = perm(c);\n    vec4 k4 = perm(c + 1.0);\n\n    vec4 o1 = fract(k3 * (1.0 / 41.0));\n    vec4 o2 = fract(k4 * (1.0 / 41.0));\n\n    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);\n    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);\n\n    return o4.y * d.y + o4.x * (1.0 - d.y);\n}\n\n#define NUM_OCTAVES 5\n\nfloat fbm(vec3 x) {\n\tfloat v = 0.0;\n\tfloat a = 0.9; //0.5\n  int o = NUM_OCTAVES;\n\tfor (int i = 0; i < o; ++i) {\n\t\tv += a * noise(x);\n\t\tx = x * 2.25 + 2.0; //2.0\n\t\ta *= 0.55; //0.5\n\t}\n\treturn v;\n}\n\nvoid main() {\n  vec3 pos = vec3(fs_Pos,1.0);\n  float warp_noise = fbm(pos.xyz + fbm( pos.xyz + fbm( pos.xyz )));\n\n  out_Col = vec4(0.5 * (fs_Pos + vec2(1.0)), 0.0, 1.0) * warp_noise;\n  out_Col += vec4(0.0,-0.5,0.5,0.0);\n}\n\n\n"
 
 /***/ })
 /******/ ]);
