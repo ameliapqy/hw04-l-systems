@@ -6168,6 +6168,7 @@ const controls = {
 let square;
 let screenQuad;
 let cylinder;
+let star;
 let sphere;
 let time = 0.0;
 function loadScene() {
@@ -6179,6 +6180,9 @@ function loadScene() {
     let cylinderObj = Object(__WEBPACK_IMPORTED_MODULE_7__globals__["b" /* readTextFile */])('./src/obj/cylinder.obj');
     cylinder = new __WEBPACK_IMPORTED_MODULE_10__geometry_Mesh__["a" /* default */](cylinderObj, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
     cylinder.create();
+    let starObj = Object(__WEBPACK_IMPORTED_MODULE_7__globals__["b" /* readTextFile */])('./src/obj/star.obj');
+    star = new __WEBPACK_IMPORTED_MODULE_10__geometry_Mesh__["a" /* default */](starObj, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 10, 0));
+    star.create();
     //lsystem
     // Init LSystem
     let lsystem = new __WEBPACK_IMPORTED_MODULE_9__lsystem_LSystem__["a" /* default */](controls); //new ExpansionRule(controls));
@@ -6187,6 +6191,9 @@ function loadScene() {
     //update vbo
     cylinder.setInstanceVBOTransform(new Float32Array(trunksTransform.trans), new Float32Array(trunksTransform.quat), new Float32Array(trunksTransform.scale));
     cylinder.setNumInstances(trunksTransform.count);
+    let flowersTransform = lsystem.drawingRule.flowers;
+    star.setInstanceVBOTransform(new Float32Array(trunksTransform.trans), new Float32Array(trunksTransform.quat), new Float32Array(trunksTransform.scale));
+    star.setNumInstances(trunksTransform.count);
     // Set up instanced rendering data arrays here.
     // This example creates a set of positional
     // offsets and gradiated colors for a 100x100 grid
@@ -6263,9 +6270,9 @@ function main() {
         renderer.clear();
         renderer.render(camera, flat, [screenQuad]);
         renderer.render(camera, instancedShader, [
-            //square,
+            // square,
             // cylinder,
-            cylinder,
+            star,
         ]);
         stats.end();
         // Tell the browser to call `tick` again whenever it renders a new frame
@@ -16709,7 +16716,7 @@ class LSystem {
         //  let expandedStr = this.expansionRule.string;
         // this.drawingRule.draw(expandedStr);
         console.log(this.drawingRule);
-        this.drawingRule.draw('FFF');
+        this.drawingRule.draw('FFFX');
         //set up instance VBOs
         let trunksTransform = this.drawingRule.trunks;
         //update vbo
@@ -16805,7 +16812,7 @@ class DrawingRule {
         this.turtleStack.push(this.turtle);
         //set up drawing rules
         this.rules.set('F', this.drawTrunk.bind(this));
-        this.rules.set('X', this.drawTrunk.bind(this));
+        this.rules.set('X', this.drawFlowers.bind(this));
         this.rules.set('[', this.presave.bind(this));
         this.rules.set(']', this.save.bind(this));
         this.rules.set('X', this.turtle.moveForward.bind(this.turtle));
@@ -16842,6 +16849,16 @@ class DrawingRule {
         this.trunks.scale.push(t.scale[0], t.scale[1], t.scale[2]);
         this.trunks.quat.push(t.quaternion[0], t.quaternion[1], t.quaternion[2]);
         this.trunks.count += 1;
+        t.moveForward();
+    }
+    drawFlowers() {
+        let t = this.turtle;
+        //roatet cylinder so it faces forward
+        t.rotateAngleAxis(this.toRadian(90.0), t.up);
+        this.flowers.trans.push(t.pos[0], t.pos[1], t.pos[2]);
+        this.flowers.scale.push(t.scale[0], t.scale[1], t.scale[2]);
+        this.flowers.quat.push(t.quaternion[0], t.quaternion[1], t.quaternion[2]);
+        this.flowers.count += 1;
         t.moveForward();
     }
 }
