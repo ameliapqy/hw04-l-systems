@@ -40,7 +40,6 @@ class ExpansionRule {
       }
       result = curr;
     }
-
     return result;
   }
 }

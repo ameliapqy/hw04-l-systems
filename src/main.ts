@@ -22,9 +22,6 @@ const controls = {
   flower_color: [255, 130, 90],
 };
 
-// Init LSystem
-let lsystem: LSystem = new LSystem(); //new ExpansionRule(controls));
-
 let square: Square;
 let screenQuad: ScreenQuad;
 let cylinder: Mesh;
@@ -44,6 +41,8 @@ function loadScene() {
   cylinder.create();
 
   //lsystem
+  // Init LSystem
+  let lsystem: LSystem = new LSystem(controls); //new ExpansionRule(controls));
   lsystem.draw();
   let trunksTransform = lsystem.drawingRule.trunks;
 
@@ -144,6 +143,7 @@ function main() {
     renderer.render(camera, flat, [screenQuad]);
     renderer.render(camera, instancedShader, [
       //square,
+      // cylinder,
       cylinder,
     ]);
     stats.end();

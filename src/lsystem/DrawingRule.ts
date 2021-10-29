@@ -18,7 +18,7 @@ class DrawingRule {
 
   rules: Map<string, any> = new Map();
   turtle: Turtle;
-  turtleStack: Turtle[];
+  turtleStack: Turtle[] = [];
   controls: any;
 
   constructor(controls: any) {
@@ -27,6 +27,7 @@ class DrawingRule {
       vec3.fromValues(0, 1, 0), //up
       vec3.fromValues(1, 0, 0), //right
       vec3.fromValues(0, 1, 0), //forward
+      vec3.fromValues(1, 1, 1), //scale
       quat.fromValues(0, 1, 0, 0), //quat
       3, //recursion depth
       controls //control
@@ -41,10 +42,12 @@ class DrawingRule {
   }
 
   draw(grammar: string) {
-    //   for(i : grammar){
-    //         cylinder.setInstanceVBOTransform(new Float32Array(trans),new Float32Array(quat),new Float32Array(scale));
-    // cylinder.setNumInstances(count);
-    // }
+    for (let c of grammar) {
+      let func: any = this.rules.get(c);
+      if (func) {
+        func();
+      }
+    }
   }
 
   toRadian(angle: number) {
@@ -55,6 +58,11 @@ class DrawingRule {
     let t = this.turtle;
     //roatet cylinder so it faces forward
     t.rotateAngleAxis(this.toRadian(90.0), t.up);
+    this.trunks.trans.push(t.pos[0], t.pos[1], t.pos[2]);
+    this.trunks.scale.push(t.scale[0], t.scale[1], t.scale[2]);
+    this.trunks.quat.push(t.quaternion[0], t.quaternion[1], t.quaternion[2]);
+    this.trunks.count += 1;
+    t.moveForward();
   }
 }
 export default DrawingRule;

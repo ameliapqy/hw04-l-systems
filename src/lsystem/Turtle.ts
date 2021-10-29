@@ -8,17 +8,19 @@ class Turtle {
   right: vec3 = vec3.create();
   forward: vec3 = vec3.create();
   quaternion: quat = quat.create();
+  scale: vec3 = vec3.create();
   depth: number = 0;
   stepSize: number = 1;
   controls: any;
   deg: number = toRadian(25.0);
 
-  constructor(pos: vec3, up: vec3, right: vec3, forward: vec3, q: quat, depth: number, controls: any) {
+  constructor(pos: vec3, up: vec3, right: vec3, forward: vec3, scale: vec3, q: quat, depth: number, controls: any) {
     this.pos = pos;
     this.up = up;
     this.right = right;
     this.forward = forward;
     this.quaternion = q;
+    this.scale = scale;
     this.depth = depth;
     this.controls = controls;
   }
