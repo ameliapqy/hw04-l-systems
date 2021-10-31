@@ -13,6 +13,7 @@ class Turtle {
   stepSize: number = 1;
   controls: any;
   deg: number = toRadian(25.0);
+  transform: mat4 = mat4.create();
 
   constructor(pos: vec3, up: vec3, right: vec3, forward: vec3, scale: vec3, q: quat, depth: number, controls: any) {
     this.pos = pos;
@@ -25,19 +26,29 @@ class Turtle {
     this.controls = controls;
   }
 
+  updateTransform() {
+    console.log('transform:' + this.transform);
+    mat4.fromRotationTranslationScale(this.transform, this.quaternion, this.pos, this.scale);
+    console.log('transform:' + this.transform);
+  }
+
   copy() {
     let newt = new Turtle(this.pos, this.up, this.right, this.forward, this.scale, this.quaternion, this.depth, this.controls);
     return newt;
   }
 
   moveForward() {
-    vec3.scaleAndAdd(this.pos, this.pos, this.forward, this.stepSize);
+    vec3.add(this.pos, this.pos, this.forward);
+    console.log('pos: ' + this.pos);
+    // vec3.scaleAndAdd(this.pos, this.pos, this.forward, this.stepSize);
+    this.updateTransform();
+    return this.transform;
   }
 
   rotatePos() {
     this.rotateAngleAxis(this.deg, this.forward);
   }
-  
+
   rotateNeg() {
     this.rotateAngleAxis(-this.deg, this.forward);
   }

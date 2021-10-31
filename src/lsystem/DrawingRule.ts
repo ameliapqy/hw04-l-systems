@@ -6,9 +6,11 @@ import Turtle from './Turtle';
 //store the trnasform info of each instances
 export class Instance {
   count: number = 0;
-  trans: number[] = [];
-  scale: number[] = [];
-  quat: number[] = [];
+  col1: number[] = [];
+  col2: number[] = [];
+  col3: number[] = [];
+  col4: number[] = [];
+  color: number[] = [];
 }
 // Represent the result of mapping a character to an L-System drawing operation
 // (possibly with multiple outcomes depending on a probability).
@@ -23,22 +25,21 @@ class DrawingRule {
 
   constructor(controls: any) {
     this.turtle = new Turtle(
-      vec3.fromValues(0, 0, 0), //pos
+      vec3.fromValues(0, -10, 0), //pos
       vec3.fromValues(0, 1, 0), //up
       vec3.fromValues(1, 0, 0), //right
-      vec3.fromValues(0, 10, 0), //forward
+      vec3.fromValues(0, 2, 0), //forward
       vec3.fromValues(1, 1, 1), //scale
-      quat.fromValues(0, 1, 0, 0), //quat
+      quat.fromValues(0, 0, 0, 1), //quat
       3, //recursion depth
       controls //control
     );
     this.turtleStack.push(this.turtle);
     //set up drawing rules
-    this.rules.set('F', this.drawTrunk.bind(this));
-    this.rules.set('X', this.drawFlowers.bind(this));
     this.rules.set('[', this.presave.bind(this));
     this.rules.set(']', this.save.bind(this));
 
+    this.rules.set('F', this.turtle.moveForward.bind(this.turtle));
     this.rules.set('X', this.turtle.moveForward.bind(this.turtle));
 
     this.rules.set('+', this.turtle.rotatePos.bind(this.turtle));
@@ -56,39 +57,53 @@ class DrawingRule {
     this.turtleStack.pop();
   }
 
-  draw(grammar: string) {
-    for (let c of grammar) {
-      let func: any = this.rules.get(c);
-      if (func) {
-        func();
-      }
-    }
-  }
-
   toRadian(angle: number) {
     return (angle * Math.PI) / 180.0;
   }
 
-  drawTrunk() {
-    let t = this.turtle;
-    //roatet cylinder so it faces forward
-    t.rotateAngleAxis(this.toRadian(90.0), t.up);
-    this.trunks.trans.push(t.pos[0], t.pos[1], t.pos[2]);
-    this.trunks.scale.push(t.scale[0], t.scale[1], t.scale[2]);
-    this.trunks.quat.push(t.quaternion[0], t.quaternion[1], t.quaternion[2]);
-    this.trunks.count += 1;
-    t.moveForward();
+  draw(str: string) {
+    // console.log('string in draw:' + str);
+    //dummy string for testing
+    str = 'FFFFFFX';
+    let allData: any = [];
+    allData.transforms = [];
+    var i: number = 0;
+    for (let char of str) {
+      let currdata: any = {};
+      currdata.transform = mat4.create();
+      let func: any = this.rules.get(char);
+      if (func) {
+        let transformMat: any = func();
+        // if (mat) {
+        let newMat: mat4 = mat4.create();
+        mat4.copy(newMat, transformMat);
+        currdata.transform = newMat;
+        currdata.char = char;
+        allData.push(currdata);
+      }
+      // if (char == '[') {
+      //   this.presave();
+      // }
+      // if (char == ']') {
+      //   this.save();
+      // }
+    }
+    // console.log(transforms);
+
+    return allData;
   }
 
-  drawFlowers() {
-    let t = this.turtle;
-    //roatet cylinder so it faces forward
-    t.rotateAngleAxis(this.toRadian(90.0), t.up);
-    this.flowers.trans.push(t.pos[0], t.pos[1], t.pos[2]);
-    this.flowers.scale.push(t.scale[0], t.scale[1], t.scale[2]);
-    this.flowers.quat.push(t.quaternion[0], t.quaternion[1], t.quaternion[2]);
-    this.flowers.count += 1;
-    t.moveForward();
+  drawFlowers(str: string) {
+    let flowers: any[] = [];
+    // let t = this.turtle;
+    // //roatet cylinder so it faces forward
+    // t.rotateAngleAxis(this.toRadian(90.0), t.up);
+    // this.flowers.trans.push(t.pos[0], t.pos[1], t.pos[2]);
+    // this.flowers.scale.push(t.scale[0], t.scale[1], t.scale[2]);
+    // this.flowers.quat.push(t.quaternion[0], t.quaternion[1], t.quaternion[2]);
+    // this.flowers.count += 1;
+    // t.moveForward();
+    return flowers;
   }
 }
 export default DrawingRule;

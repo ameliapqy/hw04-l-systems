@@ -33,9 +33,11 @@ class ExpansionRule {
       for (let old_sym of result) {
         let func = this.grammar.get(old_sym);
         if (func) {
-          curr += func();
+          curr += func;
+          console.log('+func= ' + curr);
         } else {
           curr += old_sym;
+          console.log('+old_sym= ' + curr);
         }
       }
       result = curr;

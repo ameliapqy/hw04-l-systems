@@ -31,29 +31,45 @@ let base: Mesh;
 let time: number = 0.0;
 
 function backgroundSetup() {
-  let colorsArray1 = [0.3, 0.2, 0.1, 1.0];
+  let colorsArray = [0.3, 0.2, 0.1, 1.0];
 
   let col1sArray = [10, 0, 0, 0];
   let col2sArray = [0, 10, 0, 0];
   let col3sArray = [0, 0, 10, 0];
   let col4sArray = [0, -20, 0, 1];
 
-  let colors1: Float32Array = new Float32Array(colorsArray1);
+  let colors: Float32Array = new Float32Array(colorsArray);
   let col1s: Float32Array = new Float32Array(col1sArray);
   let col2s: Float32Array = new Float32Array(col2sArray);
   let col3s: Float32Array = new Float32Array(col3sArray);
   let col4s: Float32Array = new Float32Array(col4sArray);
 
-  base.setInstanceVBOsTransform(colors1, col1s, col2s, col3s, col4s);
+  base.setInstanceVBOsTransform(colors, col1s, col2s, col3s, col4s);
   base.setNumInstances(1);
 }
 
 function lsystermSetup() {
   // Init LSystem
   let lsystem: LSystem = new LSystem(controls); //new ExpansionRule(controls));
-  lsystem.draw();
-  let trunksTransform = lsystem.drawingRule.trunks;
-  let flowersTransform = lsystem.drawingRule.flowers;
+  let data = lsystem.draw();
+  console.log(data);
+  let colors: Float32Array = new Float32Array(data['trunks'].color);
+  let col1s: Float32Array = new Float32Array(data['trunks'].col1);
+  let col2s: Float32Array = new Float32Array(data['trunks'].col2);
+  let col3s: Float32Array = new Float32Array(data['trunks'].col3);
+  let col4s: Float32Array = new Float32Array(data['trunks'].col4);
+
+  cylinder.setInstanceVBOsTransform(colors, col1s, col2s, col3s, col4s);
+  cylinder.setNumInstances(data['trunks'].color.length / 4);
+
+  star.setInstanceVBOsTransform(
+    new Float32Array(data['flowers'].color),
+    new Float32Array(data['flowers'].col1),
+    new Float32Array(data['flowers'].col2),
+    new Float32Array(data['flowers'].col3),
+    new Float32Array(data['flowers'].col4)
+  );
+  star.setNumInstances(data['flowers'].color.length / 4);
 }
 
 function loadScene() {
@@ -79,43 +95,6 @@ function loadScene() {
 
   //lsystem
   lsystermSetup();
-
-  // cylinder.setInstanceVBOsTransform(colors1, col1s, col2s, col3s, col4s);
-  // cylinder.setNumInstances(1);
-
-  // col1sArray.push(transformation[0]);
-  // col1sArray.push(transformation[1]);
-  // col1sArray.push(transformation[2]);
-  // col1sArray.push(transformation[3]);
-
-  // col2sArray.push(transformation[4]);
-  // col2sArray.push(transformation[5]);
-  // col2sArray.push(transformation[6]);
-  // col2sArray.push(transformation[7]);
-
-  // col3sArray.push(transformation[8]);
-  // col3sArray.push(transformation[9]);
-  // col3sArray.push(transformation[10]);
-  // col3sArray.push(transformation[11]);
-
-  // col4sArray.push(transformation[12]);
-  // col4sArray.push(transformation[13]);
-  // col4sArray.push(transformation[14]);
-  // col4sArray.push(1);
-
-  // //update vbo
-  // cylinder.setInstanceVBOTransform2(
-  //   new Float32Array(trunksTransform.trans),
-  //   new Float32Array(trunksTransform.quat),
-  //   new Float32Array(trunksTransform.scale)
-  // );
-
-  // star.setInstanceVBOTransform2(
-  //   new Float32Array(trunksTransform.trans),
-  //   new Float32Array(trunksTransform.quat),
-  //   new Float32Array(trunksTransform.scale)
-  // );
-  // star.setNumInstances(trunksTransform.count);
 }
 
 function main() {
@@ -172,11 +151,7 @@ function main() {
 
     renderer.clear();
     renderer.render(camera, flat, [screenQuad]);
-    renderer.render(camera, instancedShader, [
-      cylinder,
-      // star,
-      base,
-    ]);
+    renderer.render(camera, instancedShader, [cylinder, star, base]);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
