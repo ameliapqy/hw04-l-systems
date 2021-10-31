@@ -37,11 +37,11 @@ function loadScene() {
   screenQuad.create();
 
   //load from obj
-  let cylinderObj: string = readTextFile('./src/obj/cylinder.obj');
+  let cylinderObj: string = readTextFile('https://raw.githubusercontent.com/ameliapqy/hw04-l-systems/master/src/obj/cylinder.obj');
   cylinder = new Mesh(cylinderObj, vec3.fromValues(0, 0, 0));
   cylinder.create();
 
-  let starObj: string = readTextFile('./src/obj/star.obj');
+  let starObj: string = readTextFile('https://raw.githubusercontent.com/ameliapqy/hw04-l-systems/master/src/obj/star.obj');
   star = new Mesh(starObj, vec3.fromValues(0, 10, 0));
   star.create();
 
@@ -51,12 +51,21 @@ function loadScene() {
   lsystem.draw();
   let trunksTransform = lsystem.drawingRule.trunks;
 
-  let colorsArray1 = [];
+  let colorsArray1 = [0.3, 0.2, 0.1, 1.0];
 
-  let col1sArray = [1, 0, 0, 0];
-  let col2sArray = [0, 1, 0, 0];
-  let col3sArray = [0, 0, 1, 0];
-  let col4sArray = [10, 10, 10, 1];
+  let col1sArray = [2, 0, 0, 0];
+  let col2sArray = [0, 2, 0, 0];
+  let col3sArray = [0, 0, 2, 0];
+  let col4sArray = [5, 0, 0, 1];
+
+  let colors1: Float32Array = new Float32Array(colorsArray1);
+  let col1s: Float32Array = new Float32Array(col1sArray);
+  let col2s: Float32Array = new Float32Array(col2sArray);
+  let col3s: Float32Array = new Float32Array(col3sArray);
+  let col4s: Float32Array = new Float32Array(col4sArray);
+
+  cylinder.setInstanceVBOsTransform(colors1, col1s, col2s, col3s, col4s);
+  cylinder.setNumInstances(1);
 
   // col1sArray.push(transformation[0]);
   // col1sArray.push(transformation[1]);
@@ -78,27 +87,12 @@ function loadScene() {
   // col4sArray.push(transformation[14]);
   // col4sArray.push(1);
 
-  colorsArray1.push(0.3);
-  colorsArray1.push(0.2);
-  colorsArray1.push(0.1);
-  colorsArray1.push(1.0); // Alpha channel
-
-  let colors1: Float32Array = new Float32Array(colorsArray1);
-  let col1s: Float32Array = new Float32Array(col1sArray);
-  let col2s: Float32Array = new Float32Array(col2sArray);
-  let col3s: Float32Array = new Float32Array(col3sArray);
-  let col4s: Float32Array = new Float32Array(col4sArray);
-
-  cylinder.setInstanceVBOsTransform(colors1, col1s, col2s, col3s, col4s);
-
   // //update vbo
   // cylinder.setInstanceVBOTransform2(
   //   new Float32Array(trunksTransform.trans),
   //   new Float32Array(trunksTransform.quat),
   //   new Float32Array(trunksTransform.scale)
   // );
-
-  cylinder.setNumInstances(5);
 
   let flowersTransform = lsystem.drawingRule.flowers;
   // star.setInstanceVBOTransform2(
@@ -135,11 +129,6 @@ function loadScene() {
 
   // cylinder.setInstanceVBOs(offsets, colors);
   // cylinder.setNumInstances(1);
-}
-
-function instanceRrendering() {
-  //if (changed) {
-  //}
 }
 
 function main() {

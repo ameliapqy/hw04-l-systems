@@ -7,32 +7,23 @@ abstract class Drawable {
   bufPos: WebGLBuffer;
   bufNor: WebGLBuffer;
   bufTranslate: WebGLBuffer;
-  bufCol: WebGLBuffer;
-  bufUV: WebGLBuffer;
-
   bufCol1: WebGLBuffer;
   bufCol2: WebGLBuffer;
   bufCol3: WebGLBuffer;
   bufCol4: WebGLBuffer;
-
-  //new buffers
-  bufQuat: WebGLBuffer;
-  bufScale: WebGLBuffer;
+  bufCol: WebGLBuffer;
+  bufUV: WebGLBuffer;
 
   idxGenerated: boolean = false;
   posGenerated: boolean = false;
   norGenerated: boolean = false;
   colGenerated: boolean = false;
-
+  translateGenerated: boolean = false;
   col1Generated: boolean = false;
   col2Generated: boolean = false;
   col3Generated: boolean = false;
   col4Generated: boolean = false;
-
-  translateGenerated: boolean = false;
   uvGenerated: boolean = false;
-  quatGenerated: boolean = false;
-  scaleGenerated: boolean = false;
 
   numInstances: number = 0; // How many instances of this Drawable the shader program should draw
 
@@ -49,8 +40,6 @@ abstract class Drawable {
     gl.deleteBuffer(this.bufCol3);
     gl.deleteBuffer(this.bufCol4);
     gl.deleteBuffer(this.bufUV);
-    gl.deleteBuffer(this.bufQuat);
-    gl.deleteBuffer(this.bufScale);
   }
 
   generateIdx() {
@@ -73,6 +62,11 @@ abstract class Drawable {
     this.bufCol = gl.createBuffer();
   }
 
+  generateTranslate() {
+    this.translateGenerated = true;
+    this.bufTranslate = gl.createBuffer();
+  }
+
   generateCol1() {
     this.col1Generated = true;
     this.bufCol1 = gl.createBuffer();
@@ -93,24 +87,9 @@ abstract class Drawable {
     this.bufCol4 = gl.createBuffer();
   }
 
-  generateTranslate() {
-    this.translateGenerated = true;
-    this.bufTranslate = gl.createBuffer();
-  }
-
   generateUV() {
     this.uvGenerated = true;
     this.bufUV = gl.createBuffer();
-  }
-
-  generateQuat() {
-    this.quatGenerated = true;
-    this.bufQuat = gl.createBuffer();
-  }
-
-  generateScale() {
-    this.scaleGenerated = true;
-    this.bufScale = gl.createBuffer();
   }
 
   bindIdx(): boolean {
@@ -148,28 +127,28 @@ abstract class Drawable {
     return this.translateGenerated;
   }
 
-  bindTransform1(): boolean {
+  bindCol1(): boolean {
     if (this.col1Generated) {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol1);
     }
     return this.col1Generated;
   }
 
-  bindTransform2(): boolean {
+  bindCol2(): boolean {
     if (this.col2Generated) {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol2);
     }
     return this.col2Generated;
   }
 
-  bindTransform3(): boolean {
+  bindCol3(): boolean {
     if (this.col3Generated) {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol3);
     }
     return this.col3Generated;
   }
 
-  bindTransform4(): boolean {
+  bindCol4(): boolean {
     if (this.col4Generated) {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol4);
     }
@@ -181,20 +160,6 @@ abstract class Drawable {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.bufUV);
     }
     return this.uvGenerated;
-  }
-
-  bindQuat(): boolean {
-    if (this.quatGenerated) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.bufQuat);
-    }
-    return this.quatGenerated;
-  }
-
-  bindScale(): boolean {
-    if (this.scaleGenerated) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.bufScale);
-    }
-    return this.scaleGenerated;
   }
 
   elemCount(): number {

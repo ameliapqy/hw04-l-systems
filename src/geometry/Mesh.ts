@@ -10,7 +10,6 @@ class Mesh extends Drawable {
   colors: Float32Array;
   uvs: Float32Array;
   center: vec4;
-  offsets: Float32Array;
 
   col1: Float32Array;
   col2: Float32Array;
@@ -18,11 +17,6 @@ class Mesh extends Drawable {
   col4: Float32Array;
 
   objString: string;
-
-  // instance transform
-  trans: Float32Array;
-  quat: Float32Array;
-  scale: Float32Array;
 
   constructor(objString: string, center: vec3) {
     super(); // Call the constructor of the super class. This is required.
@@ -32,6 +26,7 @@ class Mesh extends Drawable {
   }
 
   create() {
+    this.numInstances = 1;
     let posTemp: Array<number> = [];
     let norTemp: Array<number> = [];
     let uvsTemp: Array<number> = [];
@@ -70,6 +65,11 @@ class Mesh extends Drawable {
     this.generateUV();
     this.generateCol();
 
+    this.generateCol1();
+    this.generateCol2();
+    this.generateCol3();
+    this.generateCol4();
+
     this.count = this.indices.length;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufIdx);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
@@ -91,19 +91,13 @@ class Mesh extends Drawable {
   }
 
   setInstanceVBOsTransform(colors: Float32Array, col1: Float32Array, col2: Float32Array, col3: Float32Array, col4: Float32Array) {
-    this.colors = colors;
     this.col1 = col1;
     this.col2 = col2;
     this.col3 = col3;
     this.col4 = col4;
-
-    console.log(this.bufCol);
+    this.colors = colors;
     console.log(this.bufCol1);
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
-    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
-
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol1);
-
     gl.bufferData(gl.ARRAY_BUFFER, this.col1, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol2);
     gl.bufferData(gl.ARRAY_BUFFER, this.col2, gl.STATIC_DRAW);
@@ -111,6 +105,9 @@ class Mesh extends Drawable {
     gl.bufferData(gl.ARRAY_BUFFER, this.col3, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol4);
     gl.bufferData(gl.ARRAY_BUFFER, this.col4, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
+    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
   }
 }
 
