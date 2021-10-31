@@ -30,6 +30,32 @@ let base: Mesh;
 
 let time: number = 0.0;
 
+function backgroundSetup() {
+  let colorsArray1 = [0.3, 0.2, 0.1, 1.0];
+
+  let col1sArray = [10, 0, 0, 0];
+  let col2sArray = [0, 10, 0, 0];
+  let col3sArray = [0, 0, 10, 0];
+  let col4sArray = [0, -20, 0, 1];
+
+  let colors1: Float32Array = new Float32Array(colorsArray1);
+  let col1s: Float32Array = new Float32Array(col1sArray);
+  let col2s: Float32Array = new Float32Array(col2sArray);
+  let col3s: Float32Array = new Float32Array(col3sArray);
+  let col4s: Float32Array = new Float32Array(col4sArray);
+
+  base.setInstanceVBOsTransform(colors1, col1s, col2s, col3s, col4s);
+  base.setNumInstances(1);
+}
+
+function lsystermSetup() {
+  // Init LSystem
+  let lsystem: LSystem = new LSystem(controls); //new ExpansionRule(controls));
+  lsystem.draw();
+  let trunksTransform = lsystem.drawingRule.trunks;
+  let flowersTransform = lsystem.drawingRule.flowers;
+}
+
 function loadScene() {
   square = new Square();
   square.create();
@@ -42,34 +68,20 @@ function loadScene() {
   cylinder.create();
 
   let baseObj: string = readTextFile('https://raw.githubusercontent.com/ameliapqy/hw04-l-systems/master/src/obj/base.obj');
-  base = new Mesh(baseObj, vec3.fromValues(0, -10, 0));
+  base = new Mesh(baseObj, vec3.fromValues(0, 0, 0));
   base.create();
 
   let starObj: string = readTextFile('https://raw.githubusercontent.com/ameliapqy/hw04-l-systems/master/src/obj/star.obj');
   star = new Mesh(starObj, vec3.fromValues(0, 0, 0));
   star.create();
 
+  backgroundSetup();
+
   //lsystem
-  // Init LSystem
-  let lsystem: LSystem = new LSystem(controls); //new ExpansionRule(controls));
-  lsystem.draw();
-  let trunksTransform = lsystem.drawingRule.trunks;
+  lsystermSetup();
 
-  let colorsArray1 = [0.3, 0.2, 0.1, 1.0];
-
-  let col1sArray = [2, 0, 0, 0];
-  let col2sArray = [0, 2, 0, 0];
-  let col3sArray = [0, 0, 2, 0];
-  let col4sArray = [5, 0, 0, 1];
-
-  let colors1: Float32Array = new Float32Array(colorsArray1);
-  let col1s: Float32Array = new Float32Array(col1sArray);
-  let col2s: Float32Array = new Float32Array(col2sArray);
-  let col3s: Float32Array = new Float32Array(col3sArray);
-  let col4s: Float32Array = new Float32Array(col4sArray);
-
-  base.setInstanceVBOsTransform(colors1, col1s, col2s, col3s, col4s);
-  base.setNumInstances(1);
+  // cylinder.setInstanceVBOsTransform(colors1, col1s, col2s, col3s, col4s);
+  // cylinder.setNumInstances(1);
 
   // col1sArray.push(transformation[0]);
   // col1sArray.push(transformation[1]);
@@ -98,41 +110,12 @@ function loadScene() {
   //   new Float32Array(trunksTransform.scale)
   // );
 
-  let flowersTransform = lsystem.drawingRule.flowers;
   // star.setInstanceVBOTransform2(
   //   new Float32Array(trunksTransform.trans),
   //   new Float32Array(trunksTransform.quat),
   //   new Float32Array(trunksTransform.scale)
   // );
   // star.setNumInstances(trunksTransform.count);
-
-  // Set up instanced rendering data arrays here.
-  // This example creates a set of positional
-  // offsets and gradiated colors for a 100x100 grid
-  // of squares, even though the VBO data for just
-  // one square is actually passed to the GPU
-  let offsetsArray = [1, 1, 1, 1];
-  let colorsArray = [1, 1, 1, 1];
-  let n: number = 100.0;
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      offsetsArray.push(i);
-      offsetsArray.push(j);
-      offsetsArray.push(0);
-
-      colorsArray.push(i / n);
-      colorsArray.push(j / n);
-      colorsArray.push(1.0);
-      colorsArray.push(1.0); // Alpha channel
-    }
-  }
-  let offsets: Float32Array = new Float32Array(offsetsArray);
-  let colors: Float32Array = new Float32Array(colorsArray);
-  square.setInstanceVBOs(offsets, colors);
-  square.setNumInstances(n * n); // grid of "particles"
-
-  // cylinder.setInstanceVBOs(offsets, colors);
-  // cylinder.setNumInstances(1);
 }
 
 function main() {
@@ -190,9 +173,9 @@ function main() {
     renderer.clear();
     renderer.render(camera, flat, [screenQuad]);
     renderer.render(camera, instancedShader, [
-      // square,
       cylinder,
-      star,
+      // star,
+      base,
     ]);
     stats.end();
 
