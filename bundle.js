@@ -6196,6 +6196,27 @@ let cylinder;
 let star;
 let base;
 let time = 0.0;
+function backgroundSetup() {
+    let colorsArray1 = [0.3, 0.2, 0.1, 1.0];
+    let col1sArray = [10, 0, 0, 0];
+    let col2sArray = [0, 10, 0, 0];
+    let col3sArray = [0, 0, 10, 0];
+    let col4sArray = [0, -20, 0, 1];
+    let colors1 = new Float32Array(colorsArray1);
+    let col1s = new Float32Array(col1sArray);
+    let col2s = new Float32Array(col2sArray);
+    let col3s = new Float32Array(col3sArray);
+    let col4s = new Float32Array(col4sArray);
+    base.setInstanceVBOsTransform(colors1, col1s, col2s, col3s, col4s);
+    base.setNumInstances(1);
+}
+function lsystermSetup() {
+    // Init LSystem
+    let lsystem = new __WEBPACK_IMPORTED_MODULE_9__lsystem_LSystem__["a" /* default */](controls); //new ExpansionRule(controls));
+    lsystem.draw();
+    let trunksTransform = lsystem.drawingRule.trunks;
+    let flowersTransform = lsystem.drawingRule.flowers;
+}
 function loadScene() {
     square = new __WEBPACK_IMPORTED_MODULE_3__geometry_Square__["a" /* default */]();
     square.create();
@@ -6206,28 +6227,16 @@ function loadScene() {
     cylinder = new __WEBPACK_IMPORTED_MODULE_10__geometry_Mesh__["a" /* default */](cylinderObj, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
     cylinder.create();
     let baseObj = Object(__WEBPACK_IMPORTED_MODULE_7__globals__["b" /* readTextFile */])('https://raw.githubusercontent.com/ameliapqy/hw04-l-systems/master/src/obj/base.obj');
-    base = new __WEBPACK_IMPORTED_MODULE_10__geometry_Mesh__["a" /* default */](baseObj, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, -10, 0));
+    base = new __WEBPACK_IMPORTED_MODULE_10__geometry_Mesh__["a" /* default */](baseObj, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
     base.create();
     let starObj = Object(__WEBPACK_IMPORTED_MODULE_7__globals__["b" /* readTextFile */])('https://raw.githubusercontent.com/ameliapqy/hw04-l-systems/master/src/obj/star.obj');
     star = new __WEBPACK_IMPORTED_MODULE_10__geometry_Mesh__["a" /* default */](starObj, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
     star.create();
+    backgroundSetup();
     //lsystem
-    // Init LSystem
-    let lsystem = new __WEBPACK_IMPORTED_MODULE_9__lsystem_LSystem__["a" /* default */](controls); //new ExpansionRule(controls));
-    lsystem.draw();
-    let trunksTransform = lsystem.drawingRule.trunks;
-    let colorsArray1 = [0.3, 0.2, 0.1, 1.0];
-    let col1sArray = [2, 0, 0, 0];
-    let col2sArray = [0, 2, 0, 0];
-    let col3sArray = [0, 0, 2, 0];
-    let col4sArray = [5, 0, 0, 1];
-    let colors1 = new Float32Array(colorsArray1);
-    let col1s = new Float32Array(col1sArray);
-    let col2s = new Float32Array(col2sArray);
-    let col3s = new Float32Array(col3sArray);
-    let col4s = new Float32Array(col4sArray);
-    base.setInstanceVBOsTransform(colors1, col1s, col2s, col3s, col4s);
-    base.setNumInstances(1);
+    lsystermSetup();
+    // cylinder.setInstanceVBOsTransform(colors1, col1s, col2s, col3s, col4s);
+    // cylinder.setNumInstances(1);
     // col1sArray.push(transformation[0]);
     // col1sArray.push(transformation[1]);
     // col1sArray.push(transformation[2]);
@@ -6250,38 +6259,12 @@ function loadScene() {
     //   new Float32Array(trunksTransform.quat),
     //   new Float32Array(trunksTransform.scale)
     // );
-    let flowersTransform = lsystem.drawingRule.flowers;
     // star.setInstanceVBOTransform2(
     //   new Float32Array(trunksTransform.trans),
     //   new Float32Array(trunksTransform.quat),
     //   new Float32Array(trunksTransform.scale)
     // );
     // star.setNumInstances(trunksTransform.count);
-    // Set up instanced rendering data arrays here.
-    // This example creates a set of positional
-    // offsets and gradiated colors for a 100x100 grid
-    // of squares, even though the VBO data for just
-    // one square is actually passed to the GPU
-    let offsetsArray = [1, 1, 1, 1];
-    let colorsArray = [1, 1, 1, 1];
-    let n = 100.0;
-    for (let i = 0; i < n; i++) {
-        for (let j = 0; j < n; j++) {
-            offsetsArray.push(i);
-            offsetsArray.push(j);
-            offsetsArray.push(0);
-            colorsArray.push(i / n);
-            colorsArray.push(j / n);
-            colorsArray.push(1.0);
-            colorsArray.push(1.0); // Alpha channel
-        }
-    }
-    let offsets = new Float32Array(offsetsArray);
-    let colors = new Float32Array(colorsArray);
-    square.setInstanceVBOs(offsets, colors);
-    square.setNumInstances(n * n); // grid of "particles"
-    // cylinder.setInstanceVBOs(offsets, colors);
-    // cylinder.setNumInstances(1);
 }
 function main() {
     // Initial display for framerate
@@ -6329,9 +6312,9 @@ function main() {
         renderer.clear();
         renderer.render(camera, flat, [screenQuad]);
         renderer.render(camera, instancedShader, [
-            // square,
             cylinder,
-            star,
+            // star,
+            base,
         ]);
         stats.end();
         // Tell the browser to call `tick` again whenever it renders a new frame
