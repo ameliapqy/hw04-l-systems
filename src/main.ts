@@ -26,7 +26,7 @@ let square: Square;
 let screenQuad: ScreenQuad;
 let cylinder: Mesh;
 let star: Mesh;
-let sphere: Mesh;
+let base: Mesh;
 
 let time: number = 0.0;
 
@@ -41,8 +41,12 @@ function loadScene() {
   cylinder = new Mesh(cylinderObj, vec3.fromValues(0, 0, 0));
   cylinder.create();
 
+  let baseObj: string = readTextFile('https://raw.githubusercontent.com/ameliapqy/hw04-l-systems/master/src/obj/base.obj');
+  base = new Mesh(baseObj, vec3.fromValues(0, -10, 0));
+  base.create();
+
   let starObj: string = readTextFile('https://raw.githubusercontent.com/ameliapqy/hw04-l-systems/master/src/obj/star.obj');
-  star = new Mesh(starObj, vec3.fromValues(0, 10, 0));
+  star = new Mesh(starObj, vec3.fromValues(0, 0, 0));
   star.create();
 
   //lsystem
@@ -64,8 +68,8 @@ function loadScene() {
   let col3s: Float32Array = new Float32Array(col3sArray);
   let col4s: Float32Array = new Float32Array(col4sArray);
 
-  cylinder.setInstanceVBOsTransform(colors1, col1s, col2s, col3s, col4s);
-  cylinder.setNumInstances(1);
+  base.setInstanceVBOsTransform(colors1, col1s, col2s, col3s, col4s);
+  base.setNumInstances(1);
 
   // col1sArray.push(transformation[0]);
   // col1sArray.push(transformation[1]);
