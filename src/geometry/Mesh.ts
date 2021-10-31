@@ -97,7 +97,13 @@ class Mesh extends Drawable {
     this.col3 = col3;
     this.col4 = col4;
 
+    console.log(this.bufCol);
+    console.log(this.bufCol1);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
+    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
+
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol1);
+
     gl.bufferData(gl.ARRAY_BUFFER, this.col1, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol2);
     gl.bufferData(gl.ARRAY_BUFFER, this.col2, gl.STATIC_DRAW);
@@ -105,36 +111,6 @@ class Mesh extends Drawable {
     gl.bufferData(gl.ARRAY_BUFFER, this.col3, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol4);
     gl.bufferData(gl.ARRAY_BUFFER, this.col4, gl.STATIC_DRAW);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
-    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
-  }
-
-  setInstanceVBOs(offsets: Float32Array, colors: Float32Array) {
-    this.colors = colors;
-    this.offsets = offsets;
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
-    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTranslate);
-    gl.bufferData(gl.ARRAY_BUFFER, this.offsets, gl.STATIC_DRAW);
-  }
-
-  setInstanceVBOsTransform2(trans: Float32Array, quat: Float32Array, scale: Float32Array) {
-    this.trans = trans;
-    this.quat = quat;
-    this.scale = scale;
-
-    this.generateTranslate();
-    this.generateScale();
-    this.generateQuat();
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTranslate);
-    gl.bufferData(gl.ARRAY_BUFFER, this.trans, gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufQuat);
-    gl.bufferData(gl.ARRAY_BUFFER, this.quat, gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufScale);
-    gl.bufferData(gl.ARRAY_BUFFER, this.scale, gl.STATIC_DRAW);
   }
 }
 

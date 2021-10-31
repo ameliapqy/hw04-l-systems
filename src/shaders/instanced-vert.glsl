@@ -27,7 +27,7 @@ void main()
     fs_Pos = vs_Pos;
     fs_Nor = vs_Nor;
 
-    vec3 offset = vs_Translate;
+    // vec3 offset = vs_Translate;
     // offset.z = (sin((u_Time + offset.x) * 3.14159 * 0.1) + cos((u_Time + offset.y) * 3.14159 * 0.1)) * 1.5;
 
     // vec3 billboardPos = offset + vs_Pos.x * u_CameraAxes[0] + vs_Pos.y * u_CameraAxes[1];

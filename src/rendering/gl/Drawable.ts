@@ -23,6 +23,7 @@ abstract class Drawable {
   posGenerated: boolean = false;
   norGenerated: boolean = false;
   colGenerated: boolean = false;
+
   col1Generated: boolean = false;
   col2Generated: boolean = false;
   col3Generated: boolean = false;
@@ -145,6 +146,34 @@ abstract class Drawable {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTranslate);
     }
     return this.translateGenerated;
+  }
+
+  bindTransform1(): boolean {
+    if (this.col1Generated) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol1);
+    }
+    return this.col1Generated;
+  }
+
+  bindTransform2(): boolean {
+    if (this.col2Generated) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol2);
+    }
+    return this.col2Generated;
+  }
+
+  bindTransform3(): boolean {
+    if (this.col3Generated) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol3);
+    }
+    return this.col3Generated;
+  }
+
+  bindTransform4(): boolean {
+    if (this.col4Generated) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol4);
+    }
+    return this.col4Generated;
   }
 
   bindUV(): boolean {
