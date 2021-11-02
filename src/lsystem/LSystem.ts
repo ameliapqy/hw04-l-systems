@@ -58,22 +58,19 @@ class LSystem {
       // console.log('curr data: ' + transformation);
       if (currData.char == 'U') {
         type = 'flowers';
-        // data[type].color.push(0.93);
-        // data[type].color.push(0.67);
-        // data[type].color.push(0.67);
         data[type].color.push(flower_color[0]);
         data[type].color.push(flower_color[1]);
         data[type].color.push(flower_color[2]);
         data[type].color.push(1);
       } else {
         type = 'trunks';
-        type = 'flowers'; //comment out
-        // data[type].color.push(0.74);
-        // data[type].color.push(0.98);
-        // data[type].color.push(0.99);
-        data[type].color.push(flower_color[0]);
-        data[type].color.push(flower_color[1]);
-        data[type].color.push(flower_color[2]);
+        data[type].color.push(0.74);
+        data[type].color.push(0.98);
+        data[type].color.push(0.99);
+        // type = 'flowers'; //comment out
+        // data[type].color.push(flower_color[0]);
+        // data[type].color.push(flower_color[1]);
+        // data[type].color.push(flower_color[2]);
         data[type].color.push(1);
       }
       data[type].col1.push(transformation[0]);

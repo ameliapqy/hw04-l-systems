@@ -19,7 +19,8 @@ import Mesh from './geometry/Mesh';
 const controls = {
   iterations: 1,
   angle: 30,
-  flower_color: [255, 150, 140],
+  flower_color: [255, 170, 170],
+  flower_scale: 3,
 };
 
 let square: Square;
@@ -32,12 +33,12 @@ let time: number = 0.0;
 let changed: boolean = true;
 
 function backgroundSetup() {
-  let colorsArray = [1, 1, 1, 1.0];
+  let colorsArray = [0.2, 0.1, 0.1, 1.0];
 
-  let col1sArray = [10, 0, 0, 0];
+  let col1sArray = [20, 0, 0, 0];
   let col2sArray = [0, 10, 0, 0];
-  let col3sArray = [0, 0, 10, 0];
-  let col4sArray = [0, -20, 0, 1];
+  let col3sArray = [0, 0, 20, 0];
+  let col4sArray = [0, -30, 0, 1];
 
   let colors: Float32Array = new Float32Array(colorsArray);
   let col1s: Float32Array = new Float32Array(col1sArray);
@@ -122,14 +123,22 @@ function main() {
         changed = true;
       }.bind(this)
     );
+  gui
+    .add(controls, 'angle', 0, 360)
+    .step(1)
+    .onChange(
+      function () {
+        changed = true;
+      }.bind(this)
+    );
   gui.addColor(controls, 'flower_color').onChange(
     function () {
       changed = true;
     }.bind(this)
   );
   gui
-    .add(controls, 'angle', 0, 180)
-    .step(1)
+    .add(controls, 'flower_scale', 1, 5)
+    .step(0.5)
     .onChange(
       function () {
         changed = true;

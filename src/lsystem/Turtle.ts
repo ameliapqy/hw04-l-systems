@@ -21,13 +21,20 @@ class Turtle {
     this.right = right;
     this.forward = forward;
     this.quaternion = q;
-    this.scale = scale;
     this.depth = depth;
     this.controls = controls;
+    this.scale = scale;
   }
 
   updateTransform() {
     mat4.fromRotationTranslationScale(this.transform, this.quaternion, this.pos, this.scale);
+  }
+
+  updateTransformU() {
+    let s: vec3 = vec3.fromValues(this.controls.flower_scale, this.controls.flower_scale, this.controls.flower_scale);
+    let trans: mat4 = mat4.create();
+
+    mat4.fromRotationTranslationScale(this.transform, this.quaternion, this.pos, s);
   }
 
   copy() {
@@ -61,9 +68,27 @@ class Turtle {
     return this.transform;
   }
 
-  moveRight() {
+  moveForwardU() {
     //update forward vector
-    vec3.add(this.pos, this.pos, this.right);
+    let half = vec3.create();
+    vec3.normalize(half, this.forward);
+    vec3.multiply(half, this.forward, this.scale);
+    vec3.add(this.pos, this.pos, half);
+    //update forward vector
+
+    this.updateTransformU();
+    return this.transform;
+  }
+
+  moveRight(neg: boolean = false) {
+    let temp = vec3.create();
+    let amt = 0.6;
+    if (neg) {
+      amt = -0.6;
+    }
+    vec3.multiply(temp, this.right, vec3.fromValues(amt, amt, amt));
+    //update forward vector
+    vec3.add(this.pos, this.pos, temp);
     //update forward vector
     this.updateTransform();
     return this.transform;
@@ -85,55 +110,51 @@ class Turtle {
     return this.transform;
   }
 
-  //front and back
-  rotatePos(deg: number = 25) {
-    deg = this.controls.angle;
-    this.rotate(0, 0, deg);
-    this.updateTransform();
-    return this.transform;
+  //left and right
+  rotatePos() {
+    this.rotate(0, 0, 1);
   }
 
   //along y axis
-  rotatePosY(deg: number = 45) {
-    this.rotate(0, deg, 0);
+  rotatePosY() {
+    this.rotate(0, 1, 0);
+  }
+
+  //front and back
+  rotatePosZ() {
+    this.rotate(1, 0, 0);
     this.updateTransform();
     return this.transform;
   }
 
-  //along z axis
-  rotatePosZ(deg: number = 45) {
-    this.rotate(0, 0, deg);
-    this.updateTransform();
-    return this.transform;
+  rotateNeg() {
+    this.rotate(0, 0, 1, true);
   }
 
-  rotateNeg(deg: number = 25) {
-    this.rotate(0, 0, -deg);
-    this.updateTransform();
-    return this.transform;
-  }
+  //pass in the axis
+  rotate(x: number, y: number, z: number, neg: boolean = false) {
+    let deg = this.controls.angle;
+    if (neg) {
+      deg = -deg;
+    }
 
-  rotate(x: number, y: number, z: number) {
-    let multQuat: quat = quat.create();
-    //Creates a quaternion from the given euler angle x, y, z (in degree)
-    //translation
-    quat.fromEuler(multQuat, x, y, z);
-    quat.multiply(this.quaternion, this.quaternion, multQuat);
+    let axis = vec3.fromValues(x, y, z);
 
-    let tempForward: vec4 = vec4.fromValues(this.forward[0], this.forward[1], this.forward[2], 1.0);
-    let rotMat: mat4 = mat4.create();
-    mat4.fromQuat(rotMat, this.quaternion);
-    vec4.transformMat4(tempForward, tempForward, rotMat);
+    let q: quat = quat.create();
+    quat.setAxisAngle(q, axis, toRadian(deg));
+
+    let tempForward: vec4 = vec4.fromValues(this.forward[0], this.forward[1], this.forward[2], 0);
+    vec4.transformQuat(tempForward, tempForward, q);
     this.forward = vec3.fromValues(tempForward[0], tempForward[1], tempForward[2]);
 
-    // let tempRight: vec4 = vec4.fromValues(this.right[0], this.right[1], this.right[2], 1.0);
-    // let rotMat2: mat4 = mat4.create();
-    // mat4.fromQuat(rotMat, this.quaternion);
-    // vec4.transformMat4(tempRight, tempRight, rotMat2);
-    // this.right = vec3.fromValues(tempRight[0], tempRight[1], tempRight[2]);
+    let tempRight: vec4 = vec4.fromValues(this.right[0], this.right[1], this.right[2], 1.0);
+    vec4.transformQuat(tempRight, tempRight, q);
+    this.right = vec3.fromValues(tempRight[0], tempRight[1], tempRight[2]);
 
-    // this.moveForward();
-    this.moveRight();
+    // update quat
+    quat.multiply(this.quaternion, q, this.quaternion);
+    quat.normalize(this.quaternion, this.quaternion);
+    this.moveRight(neg);
   }
 
   setTurtle(turtle: Turtle) {
