@@ -15,7 +15,7 @@ class LSystem {
   constructor(controls: any) {
     this.expansionRule = new ExpansionRule(controls);
     this.drawingRule = new DrawingRule(controls);
-    this.recursionDepth = 2;
+    this.recursionDepth = 1;
     this.controls = controls;
   }
 
@@ -49,15 +49,15 @@ class LSystem {
       // console.log('curr data: ' + transformation);
       if (currData.char == 'U') {
         type = 'flowers';
-        data[type].color.push(1);
-        data[type].color.push(1);
-        data[type].color.push(1);
+        data[type].color.push(0.93);
+        data[type].color.push(0.67);
+        data[type].color.push(0.67);
         data[type].color.push(1);
       } else {
         type = 'trunks';
-        data[type].color.push(0.5);
-        data[type].color.push(0.4);
-        data[type].color.push(0.4);
+        data[type].color.push(0.74);
+        data[type].color.push(0.98);
+        data[type].color.push(0.99);
         data[type].color.push(1);
       }
       data[type].col1.push(transformation[0]);

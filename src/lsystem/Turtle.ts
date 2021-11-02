@@ -36,7 +36,33 @@ class Turtle {
   }
 
   moveForward() {
+    //update forward vector
+    let tempForward: vec4 = vec4.fromValues(this.forward[0], this.forward[1], this.forward[2], 1.0);
+    let rotMat: mat4 = mat4.create();
+    mat4.fromQuat(rotMat, this.quaternion);
+    vec4.transformMat4(tempForward, tempForward, rotMat);
+    this.forward = vec3.fromValues(tempForward[0], tempForward[1], tempForward[2]);
     vec3.add(this.pos, this.pos, this.forward);
+    //update forward vector
+    this.updateTransform();
+    return this.transform;
+  }
+
+  moveRight() {
+    //update forward vector
+    let tempRight: vec4 = vec4.fromValues(this.right[0], this.right[1], this.right[2], 1.0);
+    let rotMat: mat4 = mat4.create();
+    mat4.fromQuat(rotMat, this.quaternion);
+    vec4.transformMat4(tempRight, tempRight, rotMat);
+    this.forward = vec3.fromValues(tempRight[0], tempRight[1], tempRight[2]);
+    vec3.add(this.pos, this.pos, this.right);
+    //update forward vector
+    this.updateTransform();
+    return this.transform;
+  }
+
+  moveBackward() {
+    vec3.subtract(this.pos, this.pos, this.forward);
     //update forward vector
     this.updateTransform();
     return this.transform;
@@ -84,14 +110,9 @@ class Turtle {
     //translation
     quat.fromEuler(multQuat, x, y, z);
     quat.multiply(this.quaternion, this.quaternion, multQuat);
-    //update forward vector
-    let tempForward: vec4 = vec4.fromValues(this.forward[0], this.forward[1], this.forward[2], 1.0);
-    let rotMat: mat4 = mat4.create();
-    mat4.fromQuat(rotMat, this.quaternion);
-    vec4.transformMat4(tempForward, tempForward, rotMat);
-    this.forward = vec3.fromValues(tempForward[0], tempForward[1], tempForward[2]);
     // vec3.normalize(this.forward, this.forward);
-    // this.moveForwardH();
+    this.moveForward();
+    this.moveRight();
   }
 }
 

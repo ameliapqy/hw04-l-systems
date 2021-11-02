@@ -28,7 +28,7 @@ class DrawingRule {
       vec3.fromValues(0, -10, 0), //pos
       vec3.fromValues(0, 1, 0), //up
       vec3.fromValues(1, 0, 0), //right
-      vec3.fromValues(0, 2, 0), //forward
+      vec3.fromValues(0, 6, 0), //forward
       vec3.fromValues(1, 1, 1), //scale
       quat.fromValues(0, 0, 0, 1), //quat
       3, //recursion depth
@@ -41,6 +41,8 @@ class DrawingRule {
 
     this.rules.set('F', this.turtle.moveForward.bind(this.turtle));
     this.rules.set('X', this.turtle.moveForward.bind(this.turtle));
+    this.rules.set('U', this.turtle.moveForward.bind(this.turtle));
+    this.rules.set('B', this.turtle.moveBackward.bind(this.turtle));
 
     this.rules.set('+', this.turtle.rotatePos.bind(this.turtle));
     this.rules.set('-', this.turtle.rotateNeg.bind(this.turtle));
@@ -64,7 +66,7 @@ class DrawingRule {
   draw(str: string) {
     // console.log('string in draw:' + str);
     //dummy string for testing
-    // str = 'FFFFF++FFFFFFX';
+    str = 'BFFFFF+FFFFFFXU';
     let allData: any = [];
     allData.transforms = [];
     var i: number = 0;

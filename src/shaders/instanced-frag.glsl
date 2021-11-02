@@ -15,7 +15,7 @@ void main()
     // out_Col = vec4(dist) * fs_Col;
 
     //lambert
-    vec3 dir = vec3(1, 1, 1) - fs_Pos.xyz;
+    vec3 dir = vec3(10,10,10) - fs_Pos.xyz;
 	float diffuseTerm = dot(normalize(fs_Nor.xyz), normalize(dir));
 	diffuseTerm = clamp(diffuseTerm, 0.0, 1.0);
 	float ambientTerm = 0.2;

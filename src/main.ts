@@ -25,13 +25,13 @@ const controls = {
 let square: Square;
 let screenQuad: ScreenQuad;
 let cylinder: Mesh;
-let petal: Mesh;
+let flower: Mesh;
 let base: Mesh;
 
 let time: number = 0.0;
 
 function backgroundSetup() {
-  let colorsArray = [0.3, 0.2, 0.1, 1.0];
+  let colorsArray = [1, 1, 1, 1.0];
 
   let col1sArray = [10, 0, 0, 0];
   let col2sArray = [0, 10, 0, 0];
@@ -62,14 +62,14 @@ function lsystermSetup() {
   cylinder.setInstanceVBOsTransform(colors, col1s, col2s, col3s, col4s);
   cylinder.setNumInstances(data['trunks'].color.length / 4);
 
-  petal.setInstanceVBOsTransform(
+  flower.setInstanceVBOsTransform(
     new Float32Array(data['flowers'].color),
     new Float32Array(data['flowers'].col1),
     new Float32Array(data['flowers'].col2),
     new Float32Array(data['flowers'].col3),
     new Float32Array(data['flowers'].col4)
   );
-  petal.setNumInstances(data['flowers'].color.length / 4);
+  flower.setNumInstances(data['flowers'].color.length / 4);
 }
 
 function loadScene() {
@@ -87,9 +87,9 @@ function loadScene() {
   base = new Mesh(baseObj, vec3.fromValues(0, 0, 0));
   base.create();
 
-  let petalObj: string = readTextFile('https://raw.githubusercontent.com/ameliapqy/hw04-l-systems/master/src/obj/petal.obj');
-  petal = new Mesh(petalObj, vec3.fromValues(0, 0, 0));
-  petal.create();
+  let flowerObj: string = readTextFile('https://raw.githubusercontent.com/ameliapqy/hw04-l-systems/master/src/obj/flower.obj');
+  flower = new Mesh(flowerObj, vec3.fromValues(0, 0, 0));
+  flower.create();
 
   backgroundSetup();
 
@@ -151,7 +151,7 @@ function main() {
 
     renderer.clear();
     renderer.render(camera, flat, [screenQuad]);
-    renderer.render(camera, instancedShader, [cylinder, petal, base]);
+    renderer.render(camera, instancedShader, [cylinder, flower, base]);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
@@ -174,7 +174,7 @@ function main() {
   camera.updateProjectionMatrix();
   flat.setDimensions(window.innerWidth, window.innerHeight);
 
-  // petalt the render loop
+  // flowert the render loop
   tick();
 }
 
