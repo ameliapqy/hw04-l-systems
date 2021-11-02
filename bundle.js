@@ -6092,9 +6092,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-    iterations: 3,
+    iterations: 1,
     angle: 30,
-    flower_color: [255, 130, 90],
+    flower_color: [255, 150, 140],
 };
 let square;
 let screenQuad;
@@ -6102,6 +6102,7 @@ let cylinder;
 let flower;
 let base;
 let time = 0.0;
+let changed = true;
 function backgroundSetup() {
     let colorsArray = [1, 1, 1, 1.0];
     let col1sArray = [10, 0, 0, 0];
@@ -6117,6 +6118,12 @@ function backgroundSetup() {
     base.setNumInstances(1);
 }
 function lsystermSetup() {
+    if (changed) {
+        changed = false;
+    }
+    else {
+        return;
+    }
     // Init LSystem
     let lsystem = new __WEBPACK_IMPORTED_MODULE_9__lsystem_LSystem__["a" /* default */](controls); //new ExpansionRule(controls));
     let data = lsystem.draw();
@@ -6160,6 +6167,25 @@ function main() {
     document.body.appendChild(stats.domElement);
     // Add controls to the gui
     const gui = new __WEBPACK_IMPORTED_MODULE_2_dat_gui__["GUI"]();
+    gui
+        .add(controls, 'iterations', 1, 6)
+        .step(1)
+        .onChange(function () {
+        changed = true;
+    }.bind(this));
+    gui.addColor(controls, 'flower_color').onChange(function () {
+        changed = true;
+    }.bind(this));
+    gui
+        .add(controls, 'angle', 0, 180)
+        .step(1)
+        .onChange(function () {
+        changed = true;
+    }.bind(this));
+    // gui.add(controls, 'speed', 0, 10).step(0.1);
+    // gui.add(controls, 'octaves', 3, 10).step(1);
+    // gui.add(controls, 'ambient_light', 1, 5).step(0.1);
+    // gui.add(controls, 'mode', { lambert: 0, 'blinn-phong': 1, 'ambient-only': 2, 'diffuse-only': 3, pulsing: 4, 'ink-wash': 5, 'night-light': 6 });
     // get canvas and webgl context
     const canvas = document.getElementById('canvas');
     const gl = canvas.getContext('webgl2');
@@ -6192,8 +6218,9 @@ function main() {
         instancedShader.setTime(time);
         flat.setTime(time++);
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
-        //set LSystem Up
         renderer.clear();
+        //set LSystem Up
+        lsystermSetup();
         renderer.render(camera, flat, [screenQuad]);
         renderer.render(camera, instancedShader, [cylinder, flower, base]);
         stats.end();
@@ -16644,21 +16671,23 @@ class ShaderProgram {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ExpansionRule__ = __webpack_require__(70);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DrawingRule__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ExpansionRule__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__DrawingRule__ = __webpack_require__(71);
+
 
 
 class LSystem {
     constructor(controls) {
-        this.expansionRule = new __WEBPACK_IMPORTED_MODULE_0__ExpansionRule__["a" /* default */](controls);
-        this.drawingRule = new __WEBPACK_IMPORTED_MODULE_1__DrawingRule__["a" /* default */](controls);
-        this.recursionDepth = 3;
+        this.expansionRule = new __WEBPACK_IMPORTED_MODULE_1__ExpansionRule__["a" /* default */](controls);
+        this.drawingRule = new __WEBPACK_IMPORTED_MODULE_2__DrawingRule__["a" /* default */](controls);
         this.controls = controls;
+        this.recursionDepth = controls.iterations;
     }
     //return VBO data to main
     draw() {
         let expandedStr = this.expansionRule.expandAxiom(this.recursionDepth);
-        console.log('expandedStr: ' + expandedStr);
+        // console.log('expandedStr: ' + expandedStr);
         //  let expandedStr = this.expansionRule.string;
         let transforms = this.drawingRule.draw(expandedStr);
         //init data
@@ -16675,6 +16704,7 @@ class LSystem {
         data.flowers.col2 = [];
         data.flowers.col3 = [];
         data.flowers.col4 = [];
+        let flower_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec4 */].fromValues(this.controls.flower_color[0] / 255.0, this.controls.flower_color[1] / 255.0, this.controls.flower_color[2] / 255.0, 1);
         let type = '';
         for (let currData of transforms) {
             if (currData.char.toUpperCase() == currData.char.toLowerCase()) {
@@ -16684,17 +16714,23 @@ class LSystem {
             // console.log('curr data: ' + transformation);
             if (currData.char == 'U') {
                 type = 'flowers';
-                data[type].color.push(0.93);
-                data[type].color.push(0.67);
-                data[type].color.push(0.67);
+                // data[type].color.push(0.93);
+                // data[type].color.push(0.67);
+                // data[type].color.push(0.67);
+                data[type].color.push(flower_color[0]);
+                data[type].color.push(flower_color[1]);
+                data[type].color.push(flower_color[2]);
                 data[type].color.push(1);
             }
             else {
                 type = 'trunks';
                 type = 'flowers'; //comment out
-                data[type].color.push(0.74);
-                data[type].color.push(0.98);
-                data[type].color.push(0.99);
+                // data[type].color.push(0.74);
+                // data[type].color.push(0.98);
+                // data[type].color.push(0.99);
+                data[type].color.push(flower_color[0]);
+                data[type].color.push(flower_color[1]);
+                data[type].color.push(flower_color[2]);
                 data[type].color.push(1);
             }
             data[type].col1.push(transformation[0]);
@@ -16834,7 +16870,7 @@ class DrawingRule {
             this.turtle = t;
             this.turtle.setTurtle(t);
         }
-        console.log(this.turtle);
+        // console.log(this.turtle);
     }
     toRadian(angle) {
         return (angle * Math.PI) / 180.0;
@@ -16955,6 +16991,7 @@ class Turtle {
     }
     //front and back
     rotatePos(deg = 25) {
+        deg = this.controls.angle;
         this.rotate(0, 0, deg);
         this.updateTransform();
         return this.transform;
