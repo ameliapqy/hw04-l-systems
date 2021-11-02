@@ -27,9 +27,7 @@ class Turtle {
   }
 
   updateTransform() {
-    console.log('transform:' + this.transform);
     mat4.fromRotationTranslationScale(this.transform, this.quaternion, this.pos, this.scale);
-    console.log('transform:' + this.transform);
   }
 
   copy() {
@@ -39,32 +37,61 @@ class Turtle {
 
   moveForward() {
     vec3.add(this.pos, this.pos, this.forward);
-    console.log('pos: ' + this.pos);
-    // vec3.scaleAndAdd(this.pos, this.pos, this.forward, this.stepSize);
+    //update forward vector
     this.updateTransform();
     return this.transform;
   }
 
-  rotatePos() {
-    this.rotateAngleAxis(this.deg, this.forward);
+  moveForwardH() {
+    let half = vec3.create();
+    vec3.divide(half, this.forward, vec3.fromValues(2, 2, 2));
+    vec3.add(this.pos, this.pos, half);
+    //update forward vector
+    this.updateTransform();
+    return this.transform;
   }
 
-  rotateNeg() {
-    this.rotateAngleAxis(-this.deg, this.forward);
+  //front and back
+  rotatePos(deg: number = 25) {
+    this.rotate(0, 0, deg);
+    this.updateTransform();
+    return this.transform;
   }
 
-  rotateAngleAxis(angle: number, axis: vec3) {
-    vec3.normalize(axis, axis);
-    let q: quat = quat.create();
-    quat.setAxisAngle(q, axis, angle);
+  //along y axis
+  rotatePosY(deg: number = 45) {
+    this.rotate(0, deg, 0);
+    this.updateTransform();
+    return this.transform;
+  }
 
+  //along z axis
+  rotatePosZ(deg: number = 45) {
+    this.rotate(0, 0, deg);
+    this.updateTransform();
+    return this.transform;
+  }
+
+  rotateNeg(deg: number = 25) {
+    this.rotate(0, 0, -deg);
+    this.updateTransform();
+    return this.transform;
+  }
+
+  rotate(x: number, y: number, z: number) {
+    let multQuat: quat = quat.create();
+    //Creates a quaternion from the given euler angle x, y, z (in degree)
+    //translation
+    quat.fromEuler(multQuat, x, y, z);
+    quat.multiply(this.quaternion, this.quaternion, multQuat);
+    //update forward vector
+    let tempForward: vec4 = vec4.fromValues(this.forward[0], this.forward[1], this.forward[2], 1.0);
     let rotMat: mat4 = mat4.create();
-    mat4.fromQuat(rotMat, q);
-    let temp: vec4 = vec4.fromValues(this.forward[0], this.forward[1], this.forward[2], 0);
-    vec4.transformQuat(temp, temp, q);
-    this.forward = vec3.fromValues(temp[0], temp[1], temp[2]);
-    quat.multiply(this.quaternion, q, this.quaternion);
-    quat.normalize(this.quaternion, this.quaternion);
+    mat4.fromQuat(rotMat, this.quaternion);
+    vec4.transformMat4(tempForward, tempForward, rotMat);
+    this.forward = vec3.fromValues(tempForward[0], tempForward[1], tempForward[2]);
+    // vec3.normalize(this.forward, this.forward);
+    // this.moveForwardH();
   }
 }
 

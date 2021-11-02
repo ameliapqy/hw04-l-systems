@@ -15,7 +15,7 @@ class LSystem {
   constructor(controls: any) {
     this.expansionRule = new ExpansionRule(controls);
     this.drawingRule = new DrawingRule(controls);
-    this.recursionDepth = 1;
+    this.recursionDepth = 2;
     this.controls = controls;
   }
 
@@ -47,7 +47,7 @@ class LSystem {
     for (let currData of transforms) {
       let transformation: mat4 = currData.transform;
       // console.log('curr data: ' + transformation);
-      if (currData.char == 'X') {
+      if (currData.char == 'U') {
         type = 'flowers';
         data[type].color.push(1);
         data[type].color.push(1);

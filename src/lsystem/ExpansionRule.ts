@@ -13,16 +13,21 @@ class ExpansionRule {
     this.grammar = new Map();
     this.grammar.set('F', this.expandF());
     this.grammar.set('X', this.expandX());
+    this.grammar.set('U', this.expandU());
   }
 
   //F = FF
   expandF() {
-    return 'FF';
+    return 'FFFF';
   }
 
   //X = +F+F-[[X]+X]+F[+FX]-X
   expandX() {
     return '+F+F-[[X]+X]+F[+FX]-X';
+  }
+
+  expandU() {
+    return 'U';
   }
 
   expandAxiom(iter: number) {
@@ -32,6 +37,8 @@ class ExpansionRule {
       let curr: string = '';
       for (let old_sym of result) {
         let func = this.grammar.get(old_sym);
+        console.log(old_sym);
+        console.log(func);
         if (func) {
           curr += func;
           console.log('+func= ' + curr);

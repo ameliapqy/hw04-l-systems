@@ -25,7 +25,7 @@ const controls = {
 let square: Square;
 let screenQuad: ScreenQuad;
 let cylinder: Mesh;
-let star: Mesh;
+let petal: Mesh;
 let base: Mesh;
 
 let time: number = 0.0;
@@ -62,14 +62,14 @@ function lsystermSetup() {
   cylinder.setInstanceVBOsTransform(colors, col1s, col2s, col3s, col4s);
   cylinder.setNumInstances(data['trunks'].color.length / 4);
 
-  star.setInstanceVBOsTransform(
+  petal.setInstanceVBOsTransform(
     new Float32Array(data['flowers'].color),
     new Float32Array(data['flowers'].col1),
     new Float32Array(data['flowers'].col2),
     new Float32Array(data['flowers'].col3),
     new Float32Array(data['flowers'].col4)
   );
-  star.setNumInstances(data['flowers'].color.length / 4);
+  petal.setNumInstances(data['flowers'].color.length / 4);
 }
 
 function loadScene() {
@@ -87,9 +87,9 @@ function loadScene() {
   base = new Mesh(baseObj, vec3.fromValues(0, 0, 0));
   base.create();
 
-  let starObj: string = readTextFile('https://raw.githubusercontent.com/ameliapqy/hw04-l-systems/master/src/obj/star.obj');
-  star = new Mesh(starObj, vec3.fromValues(0, 0, 0));
-  star.create();
+  let petalObj: string = readTextFile('https://raw.githubusercontent.com/ameliapqy/hw04-l-systems/master/src/obj/petal.obj');
+  petal = new Mesh(petalObj, vec3.fromValues(0, 0, 0));
+  petal.create();
 
   backgroundSetup();
 
@@ -151,7 +151,7 @@ function main() {
 
     renderer.clear();
     renderer.render(camera, flat, [screenQuad]);
-    renderer.render(camera, instancedShader, [cylinder, star, base]);
+    renderer.render(camera, instancedShader, [cylinder, petal, base]);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
@@ -174,7 +174,7 @@ function main() {
   camera.updateProjectionMatrix();
   flat.setDimensions(window.innerWidth, window.innerHeight);
 
-  // Start the render loop
+  // petalt the render loop
   tick();
 }
 

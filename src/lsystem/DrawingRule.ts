@@ -64,7 +64,7 @@ class DrawingRule {
   draw(str: string) {
     // console.log('string in draw:' + str);
     //dummy string for testing
-    str = 'FFFFFFX';
+    // str = 'FFFFF++FFFFFFX';
     let allData: any = [];
     allData.transforms = [];
     var i: number = 0;
@@ -74,12 +74,13 @@ class DrawingRule {
       let func: any = this.rules.get(char);
       if (func) {
         let transformMat: any = func();
-        // if (mat) {
-        let newMat: mat4 = mat4.create();
-        mat4.copy(newMat, transformMat);
-        currdata.transform = newMat;
-        currdata.char = char;
-        allData.push(currdata);
+        if (transformMat) {
+          let newMat: mat4 = mat4.create();
+          mat4.copy(newMat, transformMat);
+          currdata.transform = newMat;
+          currdata.char = char;
+          allData.push(currdata);
+        }
       }
       // if (char == '[') {
       //   this.presave();
@@ -88,8 +89,6 @@ class DrawingRule {
       //   this.save();
       // }
     }
-    // console.log(transforms);
-
     return allData;
   }
 
