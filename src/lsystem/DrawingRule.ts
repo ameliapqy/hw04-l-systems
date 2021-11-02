@@ -28,7 +28,8 @@ class DrawingRule {
       vec3.fromValues(0, -10, 0), //pos
       vec3.fromValues(0, 1, 0), //up
       vec3.fromValues(1, 0, 0), //right
-      vec3.fromValues(0, 6, 0), //forward
+      // vec3.fromValues(0, 6, 0), //forward
+      vec3.fromValues(0, 1, 0),
       vec3.fromValues(1, 1, 1), //scale
       quat.fromValues(0, 0, 0, 1), //quat
       3, //recursion depth
@@ -47,17 +48,20 @@ class DrawingRule {
     this.rules.set('+', this.turtle.rotatePos.bind(this.turtle));
     this.rules.set('-', this.turtle.rotateNeg.bind(this.turtle));
   }
+
   //[
   presave() {
-    this.turtleStack.push(this.turtle);
-    let newt = this.turtle.copy();
-    newt.depth = this.turtle.depth + 1;
-    this.turtle = newt;
+    let oldt = this.turtle.copy();
+    this.turtleStack.push(oldt);
   }
+
   //]
   save() {
-    this.turtleStack.pop();
-    this.turtle = this.turtleStack[0];
+    let t: Turtle = this.turtleStack.pop();
+    if (t) {
+      this.turtle = t;
+      this.turtle.setTurtle(t);
+    }
     console.log(this.turtle);
   }
 
@@ -68,8 +72,10 @@ class DrawingRule {
   draw(str: string) {
     // console.log('string in draw:' + str);
     //dummy string for testing
-    str = 'FFFF[+F]FFFF';
-    // str = 'BFFFFF+FFFFFFU';
+    // str = 'FFFF+[F]F';
+
+    // str = 'FF+F+FF';
+    // str = 'UUUUU';
     let allData: any = [];
     allData.transforms = [];
     var i: number = 0;
@@ -95,19 +101,6 @@ class DrawingRule {
       }
     }
     return allData;
-  }
-
-  drawFlowers(str: string) {
-    let flowers: any[] = [];
-    // let t = this.turtle;
-    // //roatet cylinder so it faces forward
-    // t.rotateAngleAxis(this.toRadian(90.0), t.up);
-    // this.flowers.trans.push(t.pos[0], t.pos[1], t.pos[2]);
-    // this.flowers.scale.push(t.scale[0], t.scale[1], t.scale[2]);
-    // this.flowers.quat.push(t.quaternion[0], t.quaternion[1], t.quaternion[2]);
-    // this.flowers.count += 1;
-    // t.moveForward();
-    return flowers;
   }
 }
 export default DrawingRule;

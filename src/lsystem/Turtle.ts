@@ -31,7 +31,25 @@ class Turtle {
   }
 
   copy() {
-    let newt = new Turtle(this.pos, this.up, this.right, this.forward, this.scale, this.quaternion, this.depth, this.controls);
+    let newPos: vec3 = vec3.create();
+    vec3.copy(newPos, this.pos);
+
+    let newUp: vec3 = vec3.create();
+    vec3.copy(newUp, this.up);
+
+    let newRight: vec3 = vec3.create();
+    vec3.copy(newRight, this.right);
+
+    let newForward: vec3 = vec3.create();
+    vec3.copy(newForward, this.forward);
+
+    let newScale: vec3 = vec3.create();
+    vec3.copy(newScale, this.scale);
+
+    let newQuat: quat = quat.create();
+    quat.copy(newQuat, this.quaternion);
+
+    let newt = new Turtle(newPos, newUp, newRight, newForward, newScale, newQuat, this.depth++, this.controls);
     return newt;
   }
 
@@ -107,14 +125,24 @@ class Turtle {
     vec4.transformMat4(tempForward, tempForward, rotMat);
     this.forward = vec3.fromValues(tempForward[0], tempForward[1], tempForward[2]);
 
-    let tempRight: vec4 = vec4.fromValues(this.right[0], this.right[1], this.right[2], 1.0);
-    let rotMat2: mat4 = mat4.create();
-    mat4.fromQuat(rotMat, this.quaternion);
-    vec4.transformMat4(tempRight, tempRight, rotMat2);
-    this.right = vec3.fromValues(tempRight[0], tempRight[1], tempRight[2]);
+    // let tempRight: vec4 = vec4.fromValues(this.right[0], this.right[1], this.right[2], 1.0);
+    // let rotMat2: mat4 = mat4.create();
+    // mat4.fromQuat(rotMat, this.quaternion);
+    // vec4.transformMat4(tempRight, tempRight, rotMat2);
+    // this.right = vec3.fromValues(tempRight[0], tempRight[1], tempRight[2]);
 
-    this.moveForward();
+    // this.moveForward();
     this.moveRight();
+  }
+
+  setTurtle(turtle: Turtle) {
+    vec3.copy(this.pos, turtle.pos);
+    vec3.copy(this.forward, turtle.forward);
+    vec3.copy(this.up, turtle.up);
+    vec3.copy(this.right, turtle.right);
+    quat.copy(this.quaternion, turtle.quaternion);
+    this.depth = turtle.depth - 1;
+    this.controls = turtle.controls;
   }
 }
 
