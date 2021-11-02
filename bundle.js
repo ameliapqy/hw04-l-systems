@@ -6092,7 +6092,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-    iterations: 1,
+    iterations: 2,
     angle: 30,
     flower_color: [255, 170, 170],
     flower_scale: 3,
@@ -16728,9 +16728,9 @@ class LSystem {
             }
             else {
                 type = 'trunks';
-                data[type].color.push(0.74);
-                data[type].color.push(0.98);
-                data[type].color.push(0.99);
+                data[type].color.push(0.06);
+                data[type].color.push(0.05);
+                data[type].color.push(0.05);
                 // type = 'flowers'; //comment out
                 // data[type].color.push(flower_color[0]);
                 // data[type].color.push(flower_color[1]);
@@ -16778,11 +16778,11 @@ class ExpansionRule {
     }
     //F = FF
     expandF() {
-        return 'FFFF';
+        return 'FF';
     }
     //X = +F+F-[[X]+X]+F[+FX]-X
     expandX() {
-        return '+F+F-[[X]+X]+F[+FX]-X';
+        return 'F+F-[[X]+X]+F[+FX]-X';
     }
     expandU() {
         return 'U';
@@ -16831,7 +16831,7 @@ class DrawingRule {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 1, 0), //up
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(1, 0, 0), //right
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 2.5, 0), //forward
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0.7, 0.5, 0.7), //scale
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(1, 1, 1), //scale
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].fromValues(0, 0, 0, 1), //quat
         3, //recursion depth
         controls //control
@@ -16846,17 +16846,27 @@ class DrawingRule {
         this.rules.set('B', this.turtle.moveBackward.bind(this.turtle));
         this.rules.set('+', this.turtle.rotatePos.bind(this.turtle));
         this.rules.set('-', this.turtle.rotateNeg.bind(this.turtle));
+        this.rules.set('0', this.turtle.scaleDown.bind(this.turtle));
     }
     //[
     presave() {
         let oldt = this.turtle.copy();
         this.turtleStack.push(oldt);
+        let amt = 0.98;
+        let amt2 = 0.99;
+        this.turtle.scale[0] *= amt;
+        // this.turtle.scale[1] *= amt2;
+        this.turtle.scale[2] *= amt;
+        this.turtle.scale[0] = Math.max(this.turtle.scale[0], 0.2);
+        this.turtle.scale[1] = Math.max(this.turtle.scale[1], 0.2);
+        // this.turtle.stepSize[0] *= amt2;
+        // this.turtle.stepSize[1] *= amt2;
+        // this.turtle.stepSize[2] *= amt2;
     }
     //]
     save() {
         let t = this.turtleStack.pop();
         if (t) {
-            this.turtle = t;
             this.turtle.setTurtle(t);
         }
         // console.log(this.turtle);
@@ -16867,8 +16877,8 @@ class DrawingRule {
     draw(str) {
         // console.log('string in draw:' + str);
         //dummy string for testing
-        str = 'FF++FFUUUUU';
-        // str = 'FF+F+FF';
+        // str = 'F=FF[-F]+[+F]';
+        // str = 'FFFF++FF[F]+FF';
         // str = 'F+F+F-F---FFFFU';
         let allData = [];
         allData.transforms = [];
@@ -16919,7 +16929,7 @@ class Turtle {
         this.quaternion = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].create();
         this.scale = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
         this.depth = 0;
-        this.stepSize = 1;
+        this.stepSize = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
         this.deg = Object(__WEBPACK_IMPORTED_MODULE_1__globals__["d" /* toRadian */])(25.0);
         this.transform = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].create();
         this.pos = pos;
@@ -16930,6 +16940,7 @@ class Turtle {
         this.depth = depth;
         this.controls = controls;
         this.scale = scale;
+        this.stepSize = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(1, 1, 1);
     }
     updateTransform() {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].fromRotationTranslationScale(this.transform, this.quaternion, this.pos, this.scale);
@@ -16952,12 +16963,33 @@ class Turtle {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(newScale, this.scale);
         let newQuat = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].create();
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].copy(newQuat, this.quaternion);
-        let newt = new Turtle(newPos, newUp, newRight, newForward, newScale, newQuat, this.depth++, this.controls);
+        let newt = new Turtle(newPos, newUp, newRight, newForward, newScale, newQuat, this.depth, this.controls);
+        this.depth++;
         return newt;
+    }
+    scaleDown() {
+        let amt = 0.5;
+        this.scale[0] *= amt;
+        this.scale[1] *= amt;
+        this.scale[2] *= amt;
+        this.stepSize[0] *= amt;
+        this.stepSize[1] *= amt;
+        this.stepSize[2] *= amt;
+    }
+    scaleUp() {
+        let amt = 5;
+        this.scale[0] *= amt;
+        this.scale[1] *= amt;
+        this.scale[2] *= amt;
+        this.stepSize[0] *= amt;
+        this.stepSize[1] *= amt;
+        this.stepSize[2] *= amt;
     }
     moveForward() {
         //update forward vector
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, this.forward);
+        let n = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(n, this.forward, this.stepSize);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, n);
         //update forward vector
         this.updateTransform();
         return this.transform;
@@ -16972,15 +17004,16 @@ class Turtle {
         this.updateTransformU();
         return this.transform;
     }
-    moveRight(neg = false) {
+    moveRight(neg = false, axis) {
+        let n = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
         let temp = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
-        let amt = 0.6;
+        let amt = 0.8;
         if (neg) {
-            amt = -0.6;
+            amt = -0.8;
         }
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(temp, this.right, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(amt, amt, amt));
-        //update forward vector
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, temp);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(temp, this.stepSize, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(amt, amt, amt));
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(n, this.right, temp);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, n);
         //update forward vector
         this.updateTransform();
         return this.transform;
@@ -17034,9 +17067,11 @@ class Turtle {
         // update quat
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].multiply(this.quaternion, q, this.quaternion);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].normalize(this.quaternion, this.quaternion);
-        this.moveRight(neg);
+        // this.moveRight(neg, axis);
     }
     setTurtle(turtle) {
+        console.log(this.pos == turtle.pos);
+        // console.log(turtle.pos);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(this.pos, turtle.pos);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(this.forward, turtle.forward);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(this.up, turtle.up);
@@ -17170,7 +17205,7 @@ module.exports = "#version 300 es\nprecision highp float;\n\n// The vertex shade
 /* 78 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\nuniform vec3 u_Eye, u_Ref, u_Up;\nuniform vec2 u_Dimensions;\nuniform float u_Time;\n\nin vec2 fs_Pos;\nout vec4 out_Col;\n\n\n//toolbox functions\nfloat mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}\nvec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}\nvec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}\n\nfloat noise(vec3 p){\n    vec3 a = floor(p);\n    vec3 d = p - a;\n    d = d * d * (3.0 - 2.0 * d);\n\n    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);\n    vec4 k1 = perm(b.xyxy);\n    vec4 k2 = perm(k1.xyxy + b.zzww);\n\n    vec4 c = k2 + a.zzzz;\n    vec4 k3 = perm(c);\n    vec4 k4 = perm(c + 1.0);\n\n    vec4 o1 = fract(k3 * (1.0 / 41.0));\n    vec4 o2 = fract(k4 * (1.0 / 41.0));\n\n    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);\n    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);\n\n    return o4.y * d.y + o4.x * (1.0 - d.y);\n}\n\n#define NUM_OCTAVES 5\n\nfloat fbm(vec3 x) {\n\tfloat v = 0.0;\n\tfloat a = 0.9; //0.5\n  int o = NUM_OCTAVES;\n\tfor (int i = 0; i < o; ++i) {\n\t\tv += a * noise(x);\n\t\tx = x * 2.25 + 2.0; //2.0\n\t\ta *= 0.55; //0.5\n\t}\n\treturn v;\n}\n\nvoid main() {\n  vec3 pos = vec3(fs_Pos,1.0);\n  float warp_noise = fbm(pos.xyz + fbm( pos.xyz + fbm( pos.xyz )));\n\n  out_Col = vec4(0.5 * (fs_Pos + vec2(1.0)), 0.0, 1.0) * warp_noise;\n  out_Col -= vec4(0.1,0.2,0.2,0.0);\n  //avg r,g,b\n  float avg = (out_Col.r+out_Col.g+out_Col.b)/3.0;\n  out_Col = vec4(avg,avg,avg,1.f);\n}\n\n\n"
+module.exports = "#version 300 es\nprecision highp float;\n\nuniform vec3 u_Eye, u_Ref, u_Up;\nuniform vec2 u_Dimensions;\nuniform float u_Time;\n\nin vec2 fs_Pos;\nout vec4 out_Col;\n\n\n//toolbox functions\nfloat mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}\nvec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}\nvec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}\n\nfloat noise(vec3 p){\n    vec3 a = floor(p);\n    vec3 d = p - a;\n    d = d * d * (3.0 - 2.0 * d);\n\n    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);\n    vec4 k1 = perm(b.xyxy);\n    vec4 k2 = perm(k1.xyxy + b.zzww);\n\n    vec4 c = k2 + a.zzzz;\n    vec4 k3 = perm(c);\n    vec4 k4 = perm(c + 1.0);\n\n    vec4 o1 = fract(k3 * (1.0 / 41.0));\n    vec4 o2 = fract(k4 * (1.0 / 41.0));\n\n    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);\n    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);\n\n    return o4.y * d.y + o4.x * (1.0 - d.y);\n}\n\n#define NUM_OCTAVES 5\n\nfloat fbm(vec3 x) {\n\tfloat v = 0.0;\n\tfloat a = 0.9; //0.5\n  int o = NUM_OCTAVES;\n\tfor (int i = 0; i < o; ++i) {\n\t\tv += a * noise(x);\n\t\tx = x * 2.25 + 2.0; //2.0\n\t\ta *= 0.55; //0.5\n\t}\n\treturn v;\n}\n\nvoid main() {\n  vec3 pos = vec3(fs_Pos,1.0);\n  float warp_noise = fbm(pos.xyz + fbm( pos.xyz + fbm( pos.xyz )));\n\n  out_Col = vec4(0.5 * (fs_Pos + vec2(1.0)), 0.0, 1.0) * warp_noise;\n  out_Col += vec4(0.1,0.2,0.2,0.0);\n  //avg r,g,b\n  float avg = (out_Col.r+out_Col.g+out_Col.b)/3.0;\n  out_Col = vec4(avg,avg,avg,1.f);\n}\n\n\n"
 
 /***/ })
 /******/ ]);
