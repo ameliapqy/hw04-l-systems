@@ -62,7 +62,7 @@ class DrawingRule {
       this.turtle = t;
       this.turtle.setTurtle(t);
     }
-    console.log(this.turtle);
+    // console.log(this.turtle);
   }
 
   toRadian(angle: number) {

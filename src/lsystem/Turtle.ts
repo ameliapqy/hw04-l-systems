@@ -87,6 +87,7 @@ class Turtle {
 
   //front and back
   rotatePos(deg: number = 25) {
+    deg = this.controls.angle;
     this.rotate(0, 0, deg);
     this.updateTransform();
     return this.transform;

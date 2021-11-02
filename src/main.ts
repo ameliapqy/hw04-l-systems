@@ -17,9 +17,9 @@ import Mesh from './geometry/Mesh';
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-  iterations: 3,
+  iterations: 1,
   angle: 30,
-  flower_color: [255, 130, 90],
+  flower_color: [255, 150, 140],
 };
 
 let square: Square;
@@ -29,6 +29,7 @@ let flower: Mesh;
 let base: Mesh;
 
 let time: number = 0.0;
+let changed: boolean = true;
 
 function backgroundSetup() {
   let colorsArray = [1, 1, 1, 1.0];
@@ -49,6 +50,11 @@ function backgroundSetup() {
 }
 
 function lsystermSetup() {
+  if (changed) {
+    changed = false;
+  } else {
+    return;
+  }
   // Init LSystem
   let lsystem: LSystem = new LSystem(controls); //new ExpansionRule(controls));
   let data = lsystem.draw();
@@ -108,6 +114,31 @@ function main() {
 
   // Add controls to the gui
   const gui = new DAT.GUI();
+  gui
+    .add(controls, 'iterations', 1, 6)
+    .step(1)
+    .onChange(
+      function () {
+        changed = true;
+      }.bind(this)
+    );
+  gui.addColor(controls, 'flower_color').onChange(
+    function () {
+      changed = true;
+    }.bind(this)
+  );
+  gui
+    .add(controls, 'angle', 0, 180)
+    .step(1)
+    .onChange(
+      function () {
+        changed = true;
+      }.bind(this)
+    );
+  // gui.add(controls, 'speed', 0, 10).step(0.1);
+  // gui.add(controls, 'octaves', 3, 10).step(1);
+  // gui.add(controls, 'ambient_light', 1, 5).step(0.1);
+  // gui.add(controls, 'mode', { lambert: 0, 'blinn-phong': 1, 'ambient-only': 2, 'diffuse-only': 3, pulsing: 4, 'ink-wash': 5, 'night-light': 6 });
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement>document.getElementById('canvas');
@@ -147,9 +178,9 @@ function main() {
     instancedShader.setTime(time);
     flat.setTime(time++);
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
-    //set LSystem Up
-
     renderer.clear();
+    //set LSystem Up
+    lsystermSetup();
     renderer.render(camera, flat, [screenQuad]);
     renderer.render(camera, instancedShader, [cylinder, flower, base]);
     stats.end();

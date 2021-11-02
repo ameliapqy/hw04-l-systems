@@ -15,14 +15,14 @@ class LSystem {
   constructor(controls: any) {
     this.expansionRule = new ExpansionRule(controls);
     this.drawingRule = new DrawingRule(controls);
-    this.recursionDepth = 3;
     this.controls = controls;
+    this.recursionDepth = controls.iterations;
   }
 
   //return VBO data to main
   draw() {
     let expandedStr = this.expansionRule.expandAxiom(this.recursionDepth);
-    console.log('expandedStr: ' + expandedStr);
+    // console.log('expandedStr: ' + expandedStr);
     //  let expandedStr = this.expansionRule.string;
     let transforms: any[] = this.drawingRule.draw(expandedStr);
 
@@ -41,6 +41,12 @@ class LSystem {
     data.flowers.col2 = [];
     data.flowers.col3 = [];
     data.flowers.col4 = [];
+    let flower_color = vec4.fromValues(
+      this.controls.flower_color[0] / 255.0,
+      this.controls.flower_color[1] / 255.0,
+      this.controls.flower_color[2] / 255.0,
+      1
+    );
 
     let type: string = '';
 
@@ -52,16 +58,22 @@ class LSystem {
       // console.log('curr data: ' + transformation);
       if (currData.char == 'U') {
         type = 'flowers';
-        data[type].color.push(0.93);
-        data[type].color.push(0.67);
-        data[type].color.push(0.67);
+        // data[type].color.push(0.93);
+        // data[type].color.push(0.67);
+        // data[type].color.push(0.67);
+        data[type].color.push(flower_color[0]);
+        data[type].color.push(flower_color[1]);
+        data[type].color.push(flower_color[2]);
         data[type].color.push(1);
       } else {
         type = 'trunks';
         type = 'flowers'; //comment out
-        data[type].color.push(0.74);
-        data[type].color.push(0.98);
-        data[type].color.push(0.99);
+        // data[type].color.push(0.74);
+        // data[type].color.push(0.98);
+        // data[type].color.push(0.99);
+        data[type].color.push(flower_color[0]);
+        data[type].color.push(flower_color[1]);
+        data[type].color.push(flower_color[2]);
         data[type].color.push(1);
       }
       data[type].col1.push(transformation[0]);
