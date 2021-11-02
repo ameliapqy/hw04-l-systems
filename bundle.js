@@ -16652,7 +16652,7 @@ class LSystem {
     constructor(controls) {
         this.expansionRule = new __WEBPACK_IMPORTED_MODULE_0__ExpansionRule__["a" /* default */](controls);
         this.drawingRule = new __WEBPACK_IMPORTED_MODULE_1__DrawingRule__["a" /* default */](controls);
-        this.recursionDepth = 1;
+        this.recursionDepth = 3;
         this.controls = controls;
     }
     //return VBO data to main
@@ -16677,6 +16677,9 @@ class LSystem {
         data.flowers.col4 = [];
         let type = '';
         for (let currData of transforms) {
+            if (currData.char.toUpperCase() == currData.char.toLowerCase()) {
+                continue;
+            }
             let transformation = currData.transform;
             // console.log('curr data: ' + transformation);
             if (currData.char == 'U') {
@@ -16688,6 +16691,7 @@ class LSystem {
             }
             else {
                 type = 'trunks';
+                type = 'flowers'; //comment out
                 data[type].color.push(0.74);
                 data[type].color.push(0.98);
                 data[type].color.push(0.99);
@@ -16801,8 +16805,8 @@ class DrawingRule {
         this.turtle = new __WEBPACK_IMPORTED_MODULE_1__Turtle__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, -10, 0), //pos
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 1, 0), //up
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(1, 0, 0), //right
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 6, 0), //forward
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(1, 1, 1), //scale
+        // vec3.fromValues(0, 6, 0), //forward
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 1, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(1, 1, 1), //scale
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].fromValues(0, 0, 0, 1), //quat
         3, //recursion depth
         controls //control
@@ -16820,15 +16824,16 @@ class DrawingRule {
     }
     //[
     presave() {
-        this.turtleStack.push(this.turtle);
-        let newt = this.turtle.copy();
-        newt.depth = this.turtle.depth + 1;
-        this.turtle = newt;
+        let oldt = this.turtle.copy();
+        this.turtleStack.push(oldt);
     }
     //]
     save() {
-        this.turtleStack.pop();
-        this.turtle = this.turtleStack[0];
+        let t = this.turtleStack.pop();
+        if (t) {
+            this.turtle = t;
+            this.turtle.setTurtle(t);
+        }
         console.log(this.turtle);
     }
     toRadian(angle) {
@@ -16837,8 +16842,9 @@ class DrawingRule {
     draw(str) {
         // console.log('string in draw:' + str);
         //dummy string for testing
-        str = 'FFFF[+F]FFFF';
-        // str = 'BFFFFF+FFFFFFU';
+        // str = 'FFFF+[F]F';
+        // str = 'FF+F+FF';
+        // str = 'UUUUU';
         let allData = [];
         allData.transforms = [];
         var i = 0;
@@ -16864,18 +16870,6 @@ class DrawingRule {
             }
         }
         return allData;
-    }
-    drawFlowers(str) {
-        let flowers = [];
-        // let t = this.turtle;
-        // //roatet cylinder so it faces forward
-        // t.rotateAngleAxis(this.toRadian(90.0), t.up);
-        // this.flowers.trans.push(t.pos[0], t.pos[1], t.pos[2]);
-        // this.flowers.scale.push(t.scale[0], t.scale[1], t.scale[2]);
-        // this.flowers.quat.push(t.quaternion[0], t.quaternion[1], t.quaternion[2]);
-        // this.flowers.count += 1;
-        // t.moveForward();
-        return flowers;
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (DrawingRule);
@@ -16916,7 +16910,19 @@ class Turtle {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].fromRotationTranslationScale(this.transform, this.quaternion, this.pos, this.scale);
     }
     copy() {
-        let newt = new Turtle(this.pos, this.up, this.right, this.forward, this.scale, this.quaternion, this.depth, this.controls);
+        let newPos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(newPos, this.pos);
+        let newUp = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(newUp, this.up);
+        let newRight = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(newRight, this.right);
+        let newForward = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(newForward, this.forward);
+        let newScale = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(newScale, this.scale);
+        let newQuat = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].create();
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].copy(newQuat, this.quaternion);
+        let newt = new Turtle(newPos, newUp, newRight, newForward, newScale, newQuat, this.depth++, this.controls);
         return newt;
     }
     moveForward() {
@@ -16981,13 +16987,22 @@ class Turtle {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].fromQuat(rotMat, this.quaternion);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec4 */].transformMat4(tempForward, tempForward, rotMat);
         this.forward = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(tempForward[0], tempForward[1], tempForward[2]);
-        let tempRight = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec4 */].fromValues(this.right[0], this.right[1], this.right[2], 1.0);
-        let rotMat2 = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].create();
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].fromQuat(rotMat, this.quaternion);
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec4 */].transformMat4(tempRight, tempRight, rotMat2);
-        this.right = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(tempRight[0], tempRight[1], tempRight[2]);
-        this.moveForward();
+        // let tempRight: vec4 = vec4.fromValues(this.right[0], this.right[1], this.right[2], 1.0);
+        // let rotMat2: mat4 = mat4.create();
+        // mat4.fromQuat(rotMat, this.quaternion);
+        // vec4.transformMat4(tempRight, tempRight, rotMat2);
+        // this.right = vec3.fromValues(tempRight[0], tempRight[1], tempRight[2]);
+        // this.moveForward();
         this.moveRight();
+    }
+    setTurtle(turtle) {
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(this.pos, turtle.pos);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(this.forward, turtle.forward);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(this.up, turtle.up);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(this.right, turtle.right);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].copy(this.quaternion, turtle.quaternion);
+        this.depth = turtle.depth - 1;
+        this.controls = turtle.controls;
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (Turtle);
@@ -17114,7 +17129,7 @@ module.exports = "#version 300 es\nprecision highp float;\n\n// The vertex shade
 /* 78 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\nuniform vec3 u_Eye, u_Ref, u_Up;\nuniform vec2 u_Dimensions;\nuniform float u_Time;\n\nin vec2 fs_Pos;\nout vec4 out_Col;\n\n\n//toolbox functions\nfloat mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}\nvec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}\nvec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}\n\nfloat noise(vec3 p){\n    vec3 a = floor(p);\n    vec3 d = p - a;\n    d = d * d * (3.0 - 2.0 * d);\n\n    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);\n    vec4 k1 = perm(b.xyxy);\n    vec4 k2 = perm(k1.xyxy + b.zzww);\n\n    vec4 c = k2 + a.zzzz;\n    vec4 k3 = perm(c);\n    vec4 k4 = perm(c + 1.0);\n\n    vec4 o1 = fract(k3 * (1.0 / 41.0));\n    vec4 o2 = fract(k4 * (1.0 / 41.0));\n\n    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);\n    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);\n\n    return o4.y * d.y + o4.x * (1.0 - d.y);\n}\n\n#define NUM_OCTAVES 5\n\nfloat fbm(vec3 x) {\n\tfloat v = 0.0;\n\tfloat a = 0.9; //0.5\n  int o = NUM_OCTAVES;\n\tfor (int i = 0; i < o; ++i) {\n\t\tv += a * noise(x);\n\t\tx = x * 2.25 + 2.0; //2.0\n\t\ta *= 0.55; //0.5\n\t}\n\treturn v;\n}\n\nvoid main() {\n  vec3 pos = vec3(fs_Pos,1.0);\n  float warp_noise = fbm(pos.xyz + fbm( pos.xyz + fbm( pos.xyz )));\n\n  out_Col = vec4(0.5 * (fs_Pos + vec2(1.0)), 0.0, 1.0) * warp_noise;\n  out_Col += vec4(0.4,0.5,0.5,0.0);\n  //avg r,g,b\n  float avg = (out_Col.r+out_Col.g+out_Col.b)/3.0;\n  out_Col = vec4(out_Col.r,avg,avg,1.f);\n}\n\n\n"
+module.exports = "#version 300 es\nprecision highp float;\n\nuniform vec3 u_Eye, u_Ref, u_Up;\nuniform vec2 u_Dimensions;\nuniform float u_Time;\n\nin vec2 fs_Pos;\nout vec4 out_Col;\n\n\n//toolbox functions\nfloat mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}\nvec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}\nvec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}\n\nfloat noise(vec3 p){\n    vec3 a = floor(p);\n    vec3 d = p - a;\n    d = d * d * (3.0 - 2.0 * d);\n\n    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);\n    vec4 k1 = perm(b.xyxy);\n    vec4 k2 = perm(k1.xyxy + b.zzww);\n\n    vec4 c = k2 + a.zzzz;\n    vec4 k3 = perm(c);\n    vec4 k4 = perm(c + 1.0);\n\n    vec4 o1 = fract(k3 * (1.0 / 41.0));\n    vec4 o2 = fract(k4 * (1.0 / 41.0));\n\n    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);\n    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);\n\n    return o4.y * d.y + o4.x * (1.0 - d.y);\n}\n\n#define NUM_OCTAVES 5\n\nfloat fbm(vec3 x) {\n\tfloat v = 0.0;\n\tfloat a = 0.9; //0.5\n  int o = NUM_OCTAVES;\n\tfor (int i = 0; i < o; ++i) {\n\t\tv += a * noise(x);\n\t\tx = x * 2.25 + 2.0; //2.0\n\t\ta *= 0.55; //0.5\n\t}\n\treturn v;\n}\n\nvoid main() {\n  vec3 pos = vec3(fs_Pos,1.0);\n  float warp_noise = fbm(pos.xyz + fbm( pos.xyz + fbm( pos.xyz )));\n\n  out_Col = vec4(0.5 * (fs_Pos + vec2(1.0)), 0.0, 1.0) * warp_noise;\n  out_Col -= vec4(0.1,0.2,0.2,0.0);\n  //avg r,g,b\n  float avg = (out_Col.r+out_Col.g+out_Col.b)/3.0;\n  out_Col = vec4(avg,avg,avg,1.f);\n}\n\n\n"
 
 /***/ })
 /******/ ]);
