@@ -57,6 +57,8 @@ class DrawingRule {
   //]
   save() {
     this.turtleStack.pop();
+    this.turtle = this.turtleStack[0];
+    console.log(this.turtle);
   }
 
   toRadian(angle: number) {
@@ -66,7 +68,8 @@ class DrawingRule {
   draw(str: string) {
     // console.log('string in draw:' + str);
     //dummy string for testing
-    str = 'BFFFFF+FFFFFFXU';
+    str = 'FFFF[+F]FFFF';
+    // str = 'BFFFFF+FFFFFFU';
     let allData: any = [];
     allData.transforms = [];
     var i: number = 0;
@@ -84,12 +87,12 @@ class DrawingRule {
           allData.push(currdata);
         }
       }
-      // if (char == '[') {
-      //   this.presave();
-      // }
-      // if (char == ']') {
-      //   this.save();
-      // }
+      if (char == '[') {
+        this.presave();
+      }
+      if (char == ']') {
+        this.save();
+      }
     }
     return allData;
   }
