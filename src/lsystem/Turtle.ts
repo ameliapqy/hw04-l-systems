@@ -10,7 +10,7 @@ class Turtle {
   quaternion: quat = quat.create();
   scale: vec3 = vec3.create();
   depth: number = 0;
-  stepSize: number = 1;
+  stepSize: vec3 = vec3.create();
   controls: any;
   deg: number = toRadian(25.0);
   transform: mat4 = mat4.create();
@@ -24,6 +24,7 @@ class Turtle {
     this.depth = depth;
     this.controls = controls;
     this.scale = scale;
+    this.stepSize = vec3.fromValues(1, 1, 1);
   }
 
   updateTransform() {
@@ -56,13 +57,36 @@ class Turtle {
     let newQuat: quat = quat.create();
     quat.copy(newQuat, this.quaternion);
 
-    let newt = new Turtle(newPos, newUp, newRight, newForward, newScale, newQuat, this.depth++, this.controls);
+    let newt = new Turtle(newPos, newUp, newRight, newForward, newScale, newQuat, this.depth, this.controls);
+    this.depth++;
     return newt;
+  }
+
+  scaleDown() {
+    let amt = 0.5;
+    this.scale[0] *= amt;
+    this.scale[1] *= amt;
+    this.scale[2] *= amt;
+    this.stepSize[0] *= amt;
+    this.stepSize[1] *= amt;
+    this.stepSize[2] *= amt;
+  }
+
+  scaleUp() {
+    let amt = 5;
+    this.scale[0] *= amt;
+    this.scale[1] *= amt;
+    this.scale[2] *= amt;
+    this.stepSize[0] *= amt;
+    this.stepSize[1] *= amt;
+    this.stepSize[2] *= amt;
   }
 
   moveForward() {
     //update forward vector
-    vec3.add(this.pos, this.pos, this.forward);
+    let n = vec3.create();
+    vec3.multiply(n, this.forward, this.stepSize);
+    vec3.add(this.pos, this.pos, n);
     //update forward vector
     this.updateTransform();
     return this.transform;
@@ -80,15 +104,16 @@ class Turtle {
     return this.transform;
   }
 
-  moveRight(neg: boolean = false) {
+  moveRight(neg: boolean = false, axis: vec3) {
+    let n = vec3.create();
     let temp = vec3.create();
-    let amt = 0.6;
+    let amt = 0.8;
     if (neg) {
-      amt = -0.6;
+      amt = -0.8;
     }
-    vec3.multiply(temp, this.right, vec3.fromValues(amt, amt, amt));
-    //update forward vector
-    vec3.add(this.pos, this.pos, temp);
+    vec3.multiply(temp, this.stepSize, vec3.fromValues(amt, amt, amt));
+    vec3.multiply(n, this.right, temp);
+    vec3.add(this.pos, this.pos, n);
     //update forward vector
     this.updateTransform();
     return this.transform;
@@ -154,10 +179,12 @@ class Turtle {
     // update quat
     quat.multiply(this.quaternion, q, this.quaternion);
     quat.normalize(this.quaternion, this.quaternion);
-    this.moveRight(neg);
+    // this.moveRight(neg, axis);
   }
 
   setTurtle(turtle: Turtle) {
+    console.log(this.pos == turtle.pos);
+    // console.log(turtle.pos);
     vec3.copy(this.pos, turtle.pos);
     vec3.copy(this.forward, turtle.forward);
     vec3.copy(this.up, turtle.up);

@@ -55,7 +55,7 @@ void main() {
   float warp_noise = fbm(pos.xyz + fbm( pos.xyz + fbm( pos.xyz )));
 
   out_Col = vec4(0.5 * (fs_Pos + vec2(1.0)), 0.0, 1.0) * warp_noise;
-  out_Col -= vec4(0.1,0.2,0.2,0.0);
+  out_Col += vec4(0.1,0.2,0.2,0.0);
   //avg r,g,b
   float avg = (out_Col.r+out_Col.g+out_Col.b)/3.0;
   out_Col = vec4(avg,avg,avg,1.f);

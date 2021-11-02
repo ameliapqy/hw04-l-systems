@@ -18,12 +18,12 @@ class ExpansionRule {
 
   //F = FF
   expandF() {
-    return 'FFFF';
+    return 'FF';
   }
 
   //X = +F+F-[[X]+X]+F[+FX]-X
   expandX() {
-    return '+F+F-[[X]+X]+F[+FX]-X';
+    return 'F+F-[[X]+X]+F[+FX]-X';
   }
 
   expandU() {

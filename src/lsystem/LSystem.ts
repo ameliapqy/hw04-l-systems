@@ -64,9 +64,9 @@ class LSystem {
         data[type].color.push(1);
       } else {
         type = 'trunks';
-        data[type].color.push(0.74);
-        data[type].color.push(0.98);
-        data[type].color.push(0.99);
+        data[type].color.push(0.06);
+        data[type].color.push(0.05);
+        data[type].color.push(0.05);
         // type = 'flowers'; //comment out
         // data[type].color.push(flower_color[0]);
         // data[type].color.push(flower_color[1]);

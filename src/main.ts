@@ -17,7 +17,7 @@ import Mesh from './geometry/Mesh';
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-  iterations: 1,
+  iterations: 2,
   angle: 30,
   flower_color: [255, 170, 170],
   flower_scale: 3,

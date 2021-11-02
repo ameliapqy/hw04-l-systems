@@ -17,7 +17,7 @@ class DrawingRule {
       vec3.fromValues(0, 1, 0), //up
       vec3.fromValues(1, 0, 0), //right
       vec3.fromValues(0, 2.5, 0), //forward
-      vec3.fromValues(0.7, 0.5, 0.7), //scale
+      vec3.fromValues(1, 1, 1), //scale
       quat.fromValues(0, 0, 0, 1), //quat
       3, //recursion depth
       controls //control
@@ -34,19 +34,29 @@ class DrawingRule {
 
     this.rules.set('+', this.turtle.rotatePos.bind(this.turtle));
     this.rules.set('-', this.turtle.rotateNeg.bind(this.turtle));
+    this.rules.set('0', this.turtle.scaleDown.bind(this.turtle));
   }
 
   //[
   presave() {
     let oldt = this.turtle.copy();
     this.turtleStack.push(oldt);
+    let amt = 0.98;
+    let amt2 = 0.99;
+    this.turtle.scale[0] *= amt;
+    // this.turtle.scale[1] *= amt2;
+    this.turtle.scale[2] *= amt;
+    this.turtle.scale[0] = Math.max(this.turtle.scale[0], 0.2);
+    this.turtle.scale[1] = Math.max(this.turtle.scale[1], 0.2);
+    // this.turtle.stepSize[0] *= amt2;
+    // this.turtle.stepSize[1] *= amt2;
+    // this.turtle.stepSize[2] *= amt2;
   }
 
   //]
   save() {
     let t: Turtle = this.turtleStack.pop();
     if (t) {
-      this.turtle = t;
       this.turtle.setTurtle(t);
     }
     // console.log(this.turtle);
@@ -59,8 +69,8 @@ class DrawingRule {
   draw(str: string) {
     // console.log('string in draw:' + str);
     //dummy string for testing
-    str = 'FF++FFUUUUU';
-    // str = 'FF+F+FF';
+    // str = 'F=FF[-F]+[+F]';
+    // str = 'FFFF++FF[F]+FF';
     // str = 'F+F+F-F---FFFFU';
     let allData: any = [];
     allData.transforms = [];
