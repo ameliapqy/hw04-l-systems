@@ -6099,7 +6099,7 @@ const controls = {
 let square;
 let screenQuad;
 let cylinder;
-let star;
+let petal;
 let base;
 let time = 0.0;
 function backgroundSetup() {
@@ -6128,8 +6128,8 @@ function lsystermSetup() {
     let col4s = new Float32Array(data['trunks'].col4);
     cylinder.setInstanceVBOsTransform(colors, col1s, col2s, col3s, col4s);
     cylinder.setNumInstances(data['trunks'].color.length / 4);
-    star.setInstanceVBOsTransform(new Float32Array(data['flowers'].color), new Float32Array(data['flowers'].col1), new Float32Array(data['flowers'].col2), new Float32Array(data['flowers'].col3), new Float32Array(data['flowers'].col4));
-    star.setNumInstances(data['flowers'].color.length / 4);
+    petal.setInstanceVBOsTransform(new Float32Array(data['flowers'].color), new Float32Array(data['flowers'].col1), new Float32Array(data['flowers'].col2), new Float32Array(data['flowers'].col3), new Float32Array(data['flowers'].col4));
+    petal.setNumInstances(data['flowers'].color.length / 4);
 }
 function loadScene() {
     square = new __WEBPACK_IMPORTED_MODULE_3__geometry_Square__["a" /* default */]();
@@ -6143,9 +6143,9 @@ function loadScene() {
     let baseObj = Object(__WEBPACK_IMPORTED_MODULE_7__globals__["b" /* readTextFile */])('https://raw.githubusercontent.com/ameliapqy/hw04-l-systems/master/src/obj/base.obj');
     base = new __WEBPACK_IMPORTED_MODULE_10__geometry_Mesh__["a" /* default */](baseObj, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
     base.create();
-    let starObj = Object(__WEBPACK_IMPORTED_MODULE_7__globals__["b" /* readTextFile */])('https://raw.githubusercontent.com/ameliapqy/hw04-l-systems/master/src/obj/star.obj');
-    star = new __WEBPACK_IMPORTED_MODULE_10__geometry_Mesh__["a" /* default */](starObj, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
-    star.create();
+    let petalObj = Object(__WEBPACK_IMPORTED_MODULE_7__globals__["b" /* readTextFile */])('https://raw.githubusercontent.com/ameliapqy/hw04-l-systems/master/src/obj/petal.obj');
+    petal = new __WEBPACK_IMPORTED_MODULE_10__geometry_Mesh__["a" /* default */](petalObj, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
+    petal.create();
     backgroundSetup();
     //lsystem
     lsystermSetup();
@@ -6195,7 +6195,7 @@ function main() {
         //set LSystem Up
         renderer.clear();
         renderer.render(camera, flat, [screenQuad]);
-        renderer.render(camera, instancedShader, [cylinder, star, base]);
+        renderer.render(camera, instancedShader, [cylinder, petal, base]);
         stats.end();
         // Tell the browser to call `tick` again whenever it renders a new frame
         requestAnimationFrame(tick);
@@ -6210,7 +6210,7 @@ function main() {
     camera.setAspectRatio(window.innerWidth / window.innerHeight);
     camera.updateProjectionMatrix();
     flat.setDimensions(window.innerWidth, window.innerHeight);
-    // Start the render loop
+    // petalt the render loop
     tick();
 }
 main();
@@ -16652,7 +16652,7 @@ class LSystem {
     constructor(controls) {
         this.expansionRule = new __WEBPACK_IMPORTED_MODULE_0__ExpansionRule__["a" /* default */](controls);
         this.drawingRule = new __WEBPACK_IMPORTED_MODULE_1__DrawingRule__["a" /* default */](controls);
-        this.recursionDepth = 1;
+        this.recursionDepth = 2;
         this.controls = controls;
     }
     //return VBO data to main
@@ -16679,7 +16679,7 @@ class LSystem {
         for (let currData of transforms) {
             let transformation = currData.transform;
             // console.log('curr data: ' + transformation);
-            if (currData.char == 'X') {
+            if (currData.char == 'U') {
                 type = 'flowers';
                 data[type].color.push(1);
                 data[type].color.push(1);
@@ -16730,14 +16730,18 @@ class ExpansionRule {
         this.grammar = new Map();
         this.grammar.set('F', this.expandF());
         this.grammar.set('X', this.expandX());
+        this.grammar.set('U', this.expandU());
     }
     //F = FF
     expandF() {
-        return 'FF';
+        return 'FFFF';
     }
     //X = +F+F-[[X]+X]+F[+FX]-X
     expandX() {
         return '+F+F-[[X]+X]+F[+FX]-X';
+    }
+    expandU() {
+        return 'U';
     }
     expandAxiom(iter) {
         let result = this.axiom;
@@ -16745,6 +16749,8 @@ class ExpansionRule {
             let curr = '';
             for (let old_sym of result) {
                 let func = this.grammar.get(old_sym);
+                console.log(old_sym);
+                console.log(func);
                 if (func) {
                     curr += func;
                     console.log('+func= ' + curr);
@@ -16827,7 +16833,7 @@ class DrawingRule {
     draw(str) {
         // console.log('string in draw:' + str);
         //dummy string for testing
-        str = 'FFFFFFX';
+        // str = 'FFFFF++FFFFFFX';
         let allData = [];
         allData.transforms = [];
         var i = 0;
@@ -16837,12 +16843,13 @@ class DrawingRule {
             let func = this.rules.get(char);
             if (func) {
                 let transformMat = func();
-                // if (mat) {
-                let newMat = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].create();
-                __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].copy(newMat, transformMat);
-                currdata.transform = newMat;
-                currdata.char = char;
-                allData.push(currdata);
+                if (transformMat) {
+                    let newMat = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].create();
+                    __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].copy(newMat, transformMat);
+                    currdata.transform = newMat;
+                    currdata.char = char;
+                    allData.push(currdata);
+                }
             }
             // if (char == '[') {
             //   this.presave();
@@ -16851,7 +16858,6 @@ class DrawingRule {
             //   this.save();
             // }
         }
-        // console.log(transforms);
         return allData;
     }
     drawFlowers(str) {
@@ -16902,9 +16908,7 @@ class Turtle {
         this.controls = controls;
     }
     updateTransform() {
-        console.log('transform:' + this.transform);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].fromRotationTranslationScale(this.transform, this.quaternion, this.pos, this.scale);
-        console.log('transform:' + this.transform);
     }
     copy() {
         let newt = new Turtle(this.pos, this.up, this.right, this.forward, this.scale, this.quaternion, this.depth, this.controls);
@@ -16912,28 +16916,55 @@ class Turtle {
     }
     moveForward() {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, this.forward);
-        console.log('pos: ' + this.pos);
-        // vec3.scaleAndAdd(this.pos, this.pos, this.forward, this.stepSize);
+        //update forward vector
         this.updateTransform();
         return this.transform;
     }
-    rotatePos() {
-        this.rotateAngleAxis(this.deg, this.forward);
+    moveForwardH() {
+        let half = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].divide(half, this.forward, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(2, 2, 2));
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, half);
+        //update forward vector
+        this.updateTransform();
+        return this.transform;
     }
-    rotateNeg() {
-        this.rotateAngleAxis(-this.deg, this.forward);
+    //front and back
+    rotatePos(deg = 25) {
+        this.rotate(0, 0, deg);
+        this.updateTransform();
+        return this.transform;
     }
-    rotateAngleAxis(angle, axis) {
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].normalize(axis, axis);
-        let q = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].create();
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].setAxisAngle(q, axis, angle);
+    //along y axis
+    rotatePosY(deg = 45) {
+        this.rotate(0, deg, 0);
+        this.updateTransform();
+        return this.transform;
+    }
+    //along z axis
+    rotatePosZ(deg = 45) {
+        this.rotate(0, 0, deg);
+        this.updateTransform();
+        return this.transform;
+    }
+    rotateNeg(deg = 25) {
+        this.rotate(0, 0, -deg);
+        this.updateTransform();
+        return this.transform;
+    }
+    rotate(x, y, z) {
+        let multQuat = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].create();
+        //Creates a quaternion from the given euler angle x, y, z (in degree)
+        //translation
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].fromEuler(multQuat, x, y, z);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].multiply(this.quaternion, this.quaternion, multQuat);
+        //update forward vector
+        let tempForward = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec4 */].fromValues(this.forward[0], this.forward[1], this.forward[2], 1.0);
         let rotMat = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].create();
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].fromQuat(rotMat, q);
-        let temp = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec4 */].fromValues(this.forward[0], this.forward[1], this.forward[2], 0);
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec4 */].transformQuat(temp, temp, q);
-        this.forward = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(temp[0], temp[1], temp[2]);
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].multiply(this.quaternion, q, this.quaternion);
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].normalize(this.quaternion, this.quaternion);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].fromQuat(rotMat, this.quaternion);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec4 */].transformMat4(tempForward, tempForward, rotMat);
+        this.forward = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(tempForward[0], tempForward[1], tempForward[2]);
+        // vec3.normalize(this.forward, this.forward);
+        // this.moveForwardH();
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (Turtle);
