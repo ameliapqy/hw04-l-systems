@@ -31,11 +31,15 @@ class DrawingRule {
     this.rules.set('X', this.turtle.moveForward.bind(this.turtle));
     this.rules.set('U', this.turtle.moveForwardU.bind(this.turtle));
     this.rules.set('T', this.turtle.moveForwardT.bind(this.turtle));
+    this.rules.set('4', this.turtle.moveForward4.bind(this.turtle));
+    this.rules.set('5', this.turtle.moveForward4.bind(this.turtle));
     this.rules.set('B', this.turtle.addFlower.bind(this.turtle));
+    this.rules.set('A', this.turtle.moveBackward.bind(this.turtle));
 
     this.rules.set('+', this.turtle.rotatePos.bind(this.turtle));
     this.rules.set('/', this.turtle.rotateF.bind(this.turtle));
     this.rules.set('-', this.turtle.rotateNeg.bind(this.turtle));
+    this.rules.set('1', this.turtle.scaleUp.bind(this.turtle));
     this.rules.set('0', this.turtle.scaleDown.bind(this.turtle));
   }
 
@@ -46,13 +50,9 @@ class DrawingRule {
     let amt = 0.995;
     let amt2 = 0.99;
     this.turtle.scale[0] *= amt;
-    // this.turtle.scale[1] *= amt2;
     this.turtle.scale[2] *= amt;
-    this.turtle.scale[0] = Math.max(this.turtle.scale[0], 0.2);
-    this.turtle.scale[1] = Math.max(this.turtle.scale[1], 0.2);
-    // this.turtle.stepSize[0] *= amt2;
-    // this.turtle.stepSize[1] *= amt2;
-    // this.turtle.stepSize[2] *= amt2;
+    this.turtle.scale[0] = Math.max(this.turtle.scale[0], 0.25);
+    this.turtle.scale[2] = Math.max(this.turtle.scale[2], 0.25);
   }
 
   //]

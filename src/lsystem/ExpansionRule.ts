@@ -9,32 +9,39 @@ class ExpansionRule {
   controls: any;
 
   constructor(controls: any) {
-    this.axiom = 'FX';
+    this.axiom = 'TAAAX5';
     this.grammar = new Map();
     this.grammar.set('F', this.expandF());
     this.grammar.set('X', this.expandX());
     this.grammar.set('U', this.expandU());
     this.grammar.set('T', this.expandT());
+    this.grammar.set('5', this.expand5());
   }
 
   expandT() {
-    return 'T0T0T';
+    return '11T0T0';
   }
+
   //F = FF
   expandF() {
     return 'F';
   }
 
   //X = +F+F-[[X]+X]+F[+FX]-X
+  //'FF+[[FXU]+XU]+FF[+FXU]-XUU';
   expandX() {
-    return 'FF-[[FXU]+XU]+FF[+FXU]-XUU';
+    return 'FFF-[[FXU]+XU]+FF[+FXU]-XUU';
   }
 
   expandU() {
     let rand = Math.random();
-    if (rand < 0.9) return 'B/B/B/B/B';
-    else if (rand < 0.8) return 'B//B//B';
-    else return 'U';
+    if (rand < 0.9) return 'B/B//B/B/B';
+    else if (rand < 0.8) return 'B///B//B';
+    else return '/U';
+  }
+
+  expand5() {
+    return '444+[[45U]-4UU';
   }
 
   expandAxiom(iter: number) {

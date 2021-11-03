@@ -17,6 +17,9 @@ Instanced rendering
 - Set up the code in `main.ts` and `ShaderProgram.ts` to pass a collection of transformation data to the GPU to draw L-System geometric components
 - Created `setInstanceVBOTransform` function inside mesh class to pass transform data for instance rendering
 
+![](fin0.png)
+![](fin1.png)
+
 Lsystem scene progress:
 
 lsystem experimentation with turtle renderer: ![](lsystem.png)
@@ -27,11 +30,7 @@ houdini tree: ![](htree1.jpg) ![](htree2.jpg)
 
 - experimenting with houdini
 
-progress1: ![](progress1.png)
-
-- cylinder shows up
-
-progress2: ![](progress2.png)
+progress1: ![](progress2.png)
 
 - coded a background with fbm noise
 - imported a costumized star obj as the flower

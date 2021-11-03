@@ -9,6 +9,7 @@ class Turtle {
   forward: vec3 = vec3.create();
   quaternion: quat = quat.create();
   scale: vec3 = vec3.create();
+  tempScale: vec3 = vec3.create();
   depth: number = 0;
   stepSize: vec3 = vec3.create();
   controls: any;
@@ -25,6 +26,7 @@ class Turtle {
     this.controls = controls;
     this.scale = scale;
     this.stepSize = vec3.fromValues(1, 1, 1);
+    this.tempScale = vec3.fromValues(5.0, 5.0, 5.0);
   }
 
   updateTransform() {
@@ -32,9 +34,20 @@ class Turtle {
   }
 
   updateTransformU() {
-    let s: vec3 = vec3.fromValues(this.controls.flower_scale, this.controls.flower_scale, this.controls.flower_scale);
+    let fs1 = this.controls.flower_scale;
+    fs1 += fs1 * Math.random();
+
+    let s: vec3 = vec3.fromValues(fs1, fs1, fs1);
 
     mat4.fromRotationTranslationScale(this.transform, this.quaternion, this.pos, s);
+  }
+
+  updateTransformUR() {
+    let fs1 = 100;
+    fs1 += fs1 * Math.random();
+    let s: vec3 = vec3.fromValues(fs1, fs1, fs1);
+
+    mat4.fromRotationTranslationScale(this.transform, this.quaternion, s, s);
   }
 
   copy() {
@@ -62,22 +75,24 @@ class Turtle {
   }
 
   scaleDown() {
-    let amt = 0.5;
-    this.scale[0] *= amt;
-    this.scale[1] *= amt;
-    this.scale[2] *= amt;
-    this.stepSize[0] *= amt;
-    this.stepSize[1] *= amt;
-    this.stepSize[2] *= amt;
+    let amt = 1.05;
+    let amt2 = 0.8;
+    this.scale[0] /= amt;
+    this.scale[1] /= amt2;
+    this.scale[2] /= amt;
+    this.stepSize[0] /= amt;
+    this.stepSize[1] /= amt2;
+    this.stepSize[2] /= amt;
   }
 
   scaleUp() {
-    let amt = 2;
+    let amt = 1.05;
+    let amt2 = 0.8;
     this.scale[0] *= amt;
-    this.scale[1] *= amt;
+    this.scale[1] *= amt2;
     this.scale[2] *= amt;
     this.stepSize[0] *= amt;
-    this.stepSize[1] *= amt;
+    this.stepSize[1] *= amt2;
     this.stepSize[2] *= amt;
   }
 
@@ -89,13 +104,16 @@ class Turtle {
     return this.transform;
   }
 
+  moveForward4() {
+    let n = vec3.create();
+    vec3.multiply(n, this.forward, this.stepSize);
+    vec3.add(this.pos, this.pos, n);
+    this.updateTransformUR();
+  }
+
   moveForwardT() {
     let n = vec3.create();
-    let tempScale = vec3.create();
-    tempScale[0] = this.stepSize[0] * 5;
-    tempScale[1] = this.stepSize[1] * 0.5;
-    tempScale[2] = this.stepSize[2] * 5;
-    vec3.multiply(n, this.forward, tempScale);
+    vec3.multiply(n, this.forward, this.stepSize);
     vec3.add(this.pos, this.pos, n);
     this.updateTransform();
     return this.transform;
@@ -109,12 +127,15 @@ class Turtle {
   moveForwardU() {
     let half = vec3.create();
     vec3.normalize(half, this.forward);
+    let fs1 = this.controls.flower_scale;
+    let s: vec3 = vec3.fromValues(fs1, fs1, fs1);
+    vec3.multiply(half, half, s);
+    vec3.max(half, this.stepSize, half);
     vec3.add(this.pos, this.pos, half);
-    //update forward vector
-
     this.updateTransformU();
     return this.transform;
   }
+
   moveRight(neg: boolean = false, axis: vec3) {
     let n = vec3.create();
     let temp = vec3.create();
@@ -125,14 +146,12 @@ class Turtle {
     vec3.multiply(temp, this.stepSize, vec3.fromValues(amt, amt, amt));
     vec3.multiply(n, this.right, temp);
     vec3.add(this.pos, this.pos, n);
-    //update forward vector
     this.updateTransform();
     return this.transform;
   }
 
   moveBackward() {
     vec3.subtract(this.pos, this.pos, this.forward);
-    //update forward vector
     this.updateTransform();
     return this.transform;
   }
@@ -141,7 +160,6 @@ class Turtle {
     let half = vec3.create();
     vec3.divide(half, this.forward, vec3.fromValues(2, 2, 2));
     vec3.add(this.pos, this.pos, half);
-    //update forward vector
     this.updateTransform();
     return this.transform;
   }
@@ -152,7 +170,6 @@ class Turtle {
   }
 
   rotateF() {
-    // this.rotate(0, 1, 0);
     let rand = Math.random();
     this.rotate(1.0 * rand, 1 * rand, 1 * rand, false, true);
   }
@@ -162,10 +179,10 @@ class Turtle {
     this.rotate(0, 1, 0);
   }
 
-  //front and back
-  rotatePosZ() {
-    this.rotate(1, 0, 0);
-    this.updateTransform();
+  //rotate for flower
+  rotateFR() {
+    let rand = Math.random();
+    this.rotate(1.0 * rand, 1 * rand, 1 * rand, false, true);
     return this.transform;
   }
 
@@ -174,15 +191,13 @@ class Turtle {
   }
 
   //pass in the axis
-  rotate(x: number, y: number, z: number, neg: boolean = false, flower: boolean = false) {
-    let deg = this.controls.angle;
+  rotate(x: number, y: number, z: number, neg: boolean = false, flower: boolean = false, deg: number = this.controls.angle) {
     if (neg) {
       deg = -deg;
     }
     if (flower) {
-      deg *= 2.0;
+      deg *= 1 + 5.0 * Math.random();
     }
-
     let axis = vec3.fromValues(x, y, z);
 
     let q: quat = quat.create();

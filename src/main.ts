@@ -17,10 +17,12 @@ import Mesh from './geometry/Mesh';
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-  iterations: 4,
-  angle: 30,
+  iterations: 5,
+  angle: 25,
   flower_color: [255, 170, 170],
-  flower_scale: 3,
+  flower_scale: 4,
+  speed: 1,
+  time: 0,
 };
 
 let square: Square;
@@ -33,7 +35,7 @@ let time: number = 0.0;
 let changed: boolean = true;
 
 function backgroundSetup() {
-  let colorsArray = [0.2, 0.1, 0.1, 1.0];
+  let colorsArray = [0.5, 0.55, 0.6, 1.0];
 
   let col1sArray = [50, 0, 0, 0];
   let col2sArray = [0, 10, 0, 0];
@@ -124,7 +126,7 @@ function main() {
       }.bind(this)
     );
   gui
-    .add(controls, 'angle', 0, 360)
+    .add(controls, 'angle', 15, 35)
     .step(1)
     .onChange(
       function () {
@@ -144,6 +146,22 @@ function main() {
         changed = true;
       }.bind(this)
     );
+  // gui
+  //   .add(controls, 'speed', 0, 10)
+  //   .step(1)
+  //   .onChange(
+  //     function () {
+  //       changed = true;
+  //     }.bind(this)
+  //   );
+  // gui
+  //   .add(controls, 'time', 0, 10)
+  //   .step(1)
+  //   .onChange(
+  //     function () {
+  //       changed = true;
+  //     }.bind(this)
+  //   );
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement>document.getElementById('canvas');
@@ -158,7 +176,7 @@ function main() {
   // Initial call to load scene
   loadScene();
 
-  const camera = new Camera(vec3.fromValues(0, 0, 100), vec3.fromValues(0, 0, 0));
+  const camera = new Camera(vec3.fromValues(100, 10, 50), vec3.fromValues(0, 10, 0));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.2, 0.2, 0.2, 1);
@@ -179,9 +197,11 @@ function main() {
   // This function will be called every frame
   function tick() {
     camera.update();
+    // console.log(camera.position);
     stats.begin();
     instancedShader.setTime(time);
     flat.setTime(time++);
+    controls.time = time;
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
     //set LSystem Up
@@ -189,7 +209,6 @@ function main() {
     renderer.render(camera, flat, [screenQuad]);
     renderer.render(camera, instancedShader, [cylinder, flower, base]);
     stats.end();
-
     // Tell the browser to call `tick` again whenever it renders a new frame
     requestAnimationFrame(tick);
   }
