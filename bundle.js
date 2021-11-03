@@ -6092,10 +6092,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-    iterations: 4,
-    angle: 30,
+    iterations: 5,
+    angle: 25,
     flower_color: [255, 170, 170],
-    flower_scale: 3,
+    flower_scale: 4,
+    speed: 1,
+    time: 0,
 };
 let square;
 let screenQuad;
@@ -6105,7 +6107,7 @@ let base;
 let time = 0.0;
 let changed = true;
 function backgroundSetup() {
-    let colorsArray = [0.2, 0.1, 0.1, 1.0];
+    let colorsArray = [0.5, 0.55, 0.6, 1.0];
     let col1sArray = [50, 0, 0, 0];
     let col2sArray = [0, 10, 0, 0];
     let col3sArray = [0, 0, 50, 0];
@@ -6175,7 +6177,7 @@ function main() {
         changed = true;
     }.bind(this));
     gui
-        .add(controls, 'angle', 0, 360)
+        .add(controls, 'angle', 15, 35)
         .step(1)
         .onChange(function () {
         changed = true;
@@ -6189,6 +6191,22 @@ function main() {
         .onChange(function () {
         changed = true;
     }.bind(this));
+    // gui
+    //   .add(controls, 'speed', 0, 10)
+    //   .step(1)
+    //   .onChange(
+    //     function () {
+    //       changed = true;
+    //     }.bind(this)
+    //   );
+    // gui
+    //   .add(controls, 'time', 0, 10)
+    //   .step(1)
+    //   .onChange(
+    //     function () {
+    //       changed = true;
+    //     }.bind(this)
+    //   );
     // get canvas and webgl context
     const canvas = document.getElementById('canvas');
     const gl = canvas.getContext('webgl2');
@@ -6200,7 +6218,7 @@ function main() {
     Object(__WEBPACK_IMPORTED_MODULE_7__globals__["c" /* setGL */])(gl);
     // Initial call to load scene
     loadScene();
-    const camera = new __WEBPACK_IMPORTED_MODULE_6__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 100), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
+    const camera = new __WEBPACK_IMPORTED_MODULE_6__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(100, 10, 50), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 10, 0));
     const renderer = new __WEBPACK_IMPORTED_MODULE_5__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
     renderer.setClearColor(0.2, 0.2, 0.2, 1);
     // gl.enable(gl.BLEND);
@@ -6217,9 +6235,11 @@ function main() {
     // This function will be called every frame
     function tick() {
         camera.update();
+        // console.log(camera.position);
         stats.begin();
         instancedShader.setTime(time);
         flat.setTime(time++);
+        controls.time = time;
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.clear();
         //set LSystem Up
@@ -13370,7 +13390,7 @@ class Camera {
         this.fovy = 45;
         this.aspectRatio = 1;
         this.near = 0.1;
-        this.far = 1000;
+        this.far = 2000;
         this.position = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
         this.direction = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
         this.target = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
@@ -16771,32 +16791,37 @@ class LSystem {
 //maintain a quaternion/ forward right
 class ExpansionRule {
     constructor(controls) {
-        this.axiom = 'FX';
+        this.axiom = 'TAAAX5';
         this.grammar = new Map();
         this.grammar.set('F', this.expandF());
         this.grammar.set('X', this.expandX());
         this.grammar.set('U', this.expandU());
         this.grammar.set('T', this.expandT());
+        this.grammar.set('5', this.expand5());
     }
     expandT() {
-        return 'T0T0T';
+        return '11T0T0';
     }
     //F = FF
     expandF() {
         return 'F';
     }
     //X = +F+F-[[X]+X]+F[+FX]-X
+    //'FF+[[FXU]+XU]+FF[+FXU]-XUU';
     expandX() {
-        return 'FF-[[FXU]+XU]+FF[+FXU]-XUU';
+        return 'FFF-[[FXU]+XU]+FF[+FXU]-XUU';
     }
     expandU() {
         let rand = Math.random();
         if (rand < 0.9)
-            return 'B/B/B/B/B';
+            return 'B/B//B/B/B';
         else if (rand < 0.8)
-            return 'B//B//B';
+            return 'B///B//B';
         else
-            return 'U';
+            return '/U';
+    }
+    expand5() {
+        return '444+[[45U]-4UU';
     }
     expandAxiom(iter) {
         let result = this.axiom;
@@ -16852,10 +16877,14 @@ class DrawingRule {
         this.rules.set('X', this.turtle.moveForward.bind(this.turtle));
         this.rules.set('U', this.turtle.moveForwardU.bind(this.turtle));
         this.rules.set('T', this.turtle.moveForwardT.bind(this.turtle));
+        this.rules.set('4', this.turtle.moveForward4.bind(this.turtle));
+        this.rules.set('5', this.turtle.moveForward4.bind(this.turtle));
         this.rules.set('B', this.turtle.addFlower.bind(this.turtle));
+        this.rules.set('A', this.turtle.moveBackward.bind(this.turtle));
         this.rules.set('+', this.turtle.rotatePos.bind(this.turtle));
         this.rules.set('/', this.turtle.rotateF.bind(this.turtle));
         this.rules.set('-', this.turtle.rotateNeg.bind(this.turtle));
+        this.rules.set('1', this.turtle.scaleUp.bind(this.turtle));
         this.rules.set('0', this.turtle.scaleDown.bind(this.turtle));
     }
     //[
@@ -16865,13 +16894,9 @@ class DrawingRule {
         let amt = 0.995;
         let amt2 = 0.99;
         this.turtle.scale[0] *= amt;
-        // this.turtle.scale[1] *= amt2;
         this.turtle.scale[2] *= amt;
-        this.turtle.scale[0] = Math.max(this.turtle.scale[0], 0.2);
-        this.turtle.scale[1] = Math.max(this.turtle.scale[1], 0.2);
-        // this.turtle.stepSize[0] *= amt2;
-        // this.turtle.stepSize[1] *= amt2;
-        // this.turtle.stepSize[2] *= amt2;
+        this.turtle.scale[0] = Math.max(this.turtle.scale[0], 0.25);
+        this.turtle.scale[2] = Math.max(this.turtle.scale[2], 0.25);
     }
     //]
     save() {
@@ -16935,6 +16960,7 @@ class Turtle {
         this.forward = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
         this.quaternion = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].create();
         this.scale = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
+        this.tempScale = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
         this.depth = 0;
         this.stepSize = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
         this.deg = Object(__WEBPACK_IMPORTED_MODULE_1__globals__["d" /* toRadian */])(25.0);
@@ -16948,13 +16974,22 @@ class Turtle {
         this.controls = controls;
         this.scale = scale;
         this.stepSize = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(1, 1, 1);
+        this.tempScale = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(5.0, 5.0, 5.0);
     }
     updateTransform() {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].fromRotationTranslationScale(this.transform, this.quaternion, this.pos, this.scale);
     }
     updateTransformU() {
-        let s = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(this.controls.flower_scale, this.controls.flower_scale, this.controls.flower_scale);
+        let fs1 = this.controls.flower_scale;
+        fs1 += fs1 * Math.random();
+        let s = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(fs1, fs1, fs1);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].fromRotationTranslationScale(this.transform, this.quaternion, this.pos, s);
+    }
+    updateTransformUR() {
+        let fs1 = 100;
+        fs1 += fs1 * Math.random();
+        let s = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(fs1, fs1, fs1);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].fromRotationTranslationScale(this.transform, this.quaternion, s, s);
     }
     copy() {
         let newPos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
@@ -16974,21 +17009,23 @@ class Turtle {
         return newt;
     }
     scaleDown() {
-        let amt = 0.5;
-        this.scale[0] *= amt;
-        this.scale[1] *= amt;
-        this.scale[2] *= amt;
-        this.stepSize[0] *= amt;
-        this.stepSize[1] *= amt;
-        this.stepSize[2] *= amt;
+        let amt = 1.05;
+        let amt2 = 0.8;
+        this.scale[0] /= amt;
+        this.scale[1] /= amt2;
+        this.scale[2] /= amt;
+        this.stepSize[0] /= amt;
+        this.stepSize[1] /= amt2;
+        this.stepSize[2] /= amt;
     }
     scaleUp() {
-        let amt = 2;
+        let amt = 1.05;
+        let amt2 = 0.8;
         this.scale[0] *= amt;
-        this.scale[1] *= amt;
+        this.scale[1] *= amt2;
         this.scale[2] *= amt;
         this.stepSize[0] *= amt;
-        this.stepSize[1] *= amt;
+        this.stepSize[1] *= amt2;
         this.stepSize[2] *= amt;
     }
     moveForward() {
@@ -16998,13 +17035,15 @@ class Turtle {
         this.updateTransform();
         return this.transform;
     }
+    moveForward4() {
+        let n = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(n, this.forward, this.stepSize);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, n);
+        this.updateTransformUR();
+    }
     moveForwardT() {
         let n = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
-        let tempScale = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
-        tempScale[0] = this.stepSize[0] * 5;
-        tempScale[1] = this.stepSize[1] * 0.5;
-        tempScale[2] = this.stepSize[2] * 5;
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(n, this.forward, tempScale);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(n, this.forward, this.stepSize);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, n);
         this.updateTransform();
         return this.transform;
@@ -17016,8 +17055,11 @@ class Turtle {
     moveForwardU() {
         let half = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].normalize(half, this.forward);
+        let fs1 = this.controls.flower_scale;
+        let s = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(fs1, fs1, fs1);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(half, half, s);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].max(half, this.stepSize, half);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, half);
-        //update forward vector
         this.updateTransformU();
         return this.transform;
     }
@@ -17031,13 +17073,11 @@ class Turtle {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(temp, this.stepSize, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(amt, amt, amt));
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(n, this.right, temp);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, n);
-        //update forward vector
         this.updateTransform();
         return this.transform;
     }
     moveBackward() {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].subtract(this.pos, this.pos, this.forward);
-        //update forward vector
         this.updateTransform();
         return this.transform;
     }
@@ -17045,7 +17085,6 @@ class Turtle {
         let half = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].divide(half, this.forward, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(2, 2, 2));
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, half);
-        //update forward vector
         this.updateTransform();
         return this.transform;
     }
@@ -17054,7 +17093,6 @@ class Turtle {
         this.rotate(0, 1, 1);
     }
     rotateF() {
-        // this.rotate(0, 1, 0);
         let rand = Math.random();
         this.rotate(1.0 * rand, 1 * rand, 1 * rand, false, true);
     }
@@ -17062,23 +17100,22 @@ class Turtle {
     rotatePosY() {
         this.rotate(0, 1, 0);
     }
-    //front and back
-    rotatePosZ() {
-        this.rotate(1, 0, 0);
-        this.updateTransform();
+    //rotate for flower
+    rotateFR() {
+        let rand = Math.random();
+        this.rotate(1.0 * rand, 1 * rand, 1 * rand, false, true);
         return this.transform;
     }
     rotateNeg() {
         this.rotate(0, 0, 1, true);
     }
     //pass in the axis
-    rotate(x, y, z, neg = false, flower = false) {
-        let deg = this.controls.angle;
+    rotate(x, y, z, neg = false, flower = false, deg = this.controls.angle) {
         if (neg) {
             deg = -deg;
         }
         if (flower) {
-            deg *= 2.0;
+            deg *= 1 + 5.0 * Math.random();
         }
         let axis = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(x, y, z);
         let q = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].create();
