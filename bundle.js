@@ -6177,7 +6177,7 @@ function main() {
         changed = true;
     }.bind(this));
     gui
-        .add(controls, 'angle', 15, 35)
+        .add(controls, 'angle', 15, 100)
         .step(1)
         .onChange(function () {
         changed = true;
@@ -16797,7 +16797,6 @@ class ExpansionRule {
         this.grammar.set('X', this.expandX());
         this.grammar.set('U', this.expandU());
         this.grammar.set('T', this.expandT());
-        this.grammar.set('5', this.expand5());
     }
     expandT() {
         return '11T0T0';
@@ -16819,9 +16818,6 @@ class ExpansionRule {
             return 'B///B//B';
         else
             return '/U';
-    }
-    expand5() {
-        return '444+[[45U]-4UU';
     }
     expandAxiom(iter) {
         let result = this.axiom;
@@ -16876,9 +16872,7 @@ class DrawingRule {
         this.rules.set('F', this.turtle.moveForward.bind(this.turtle));
         this.rules.set('X', this.turtle.moveForward.bind(this.turtle));
         this.rules.set('U', this.turtle.moveForwardU.bind(this.turtle));
-        this.rules.set('T', this.turtle.moveForwardT.bind(this.turtle));
-        this.rules.set('4', this.turtle.moveForward4.bind(this.turtle));
-        this.rules.set('5', this.turtle.moveForward4.bind(this.turtle));
+        this.rules.set('T', this.turtle.moveForward.bind(this.turtle));
         this.rules.set('B', this.turtle.addFlower.bind(this.turtle));
         this.rules.set('A', this.turtle.moveBackward.bind(this.turtle));
         this.rules.set('+', this.turtle.rotatePos.bind(this.turtle));
@@ -16981,7 +16975,12 @@ class Turtle {
     }
     updateTransformU() {
         let fs1 = this.controls.flower_scale;
-        fs1 += fs1 * Math.random();
+        if (this.controls.angle < 35 && this.controls.angle >= 15) {
+            fs1 += fs1 * Math.random();
+        }
+        else {
+            fs1 = Math.max(fs1, 2 * Math.random());
+        }
         let s = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(fs1, fs1, fs1);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].fromRotationTranslationScale(this.transform, this.quaternion, this.pos, s);
     }
@@ -17033,20 +17032,9 @@ class Turtle {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(n, this.forward, this.stepSize);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, n);
         this.updateTransform();
-        return this.transform;
-    }
-    moveForward4() {
-        let n = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(n, this.forward, this.stepSize);
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, n);
-        this.updateTransformUR();
-    }
-    moveForwardT() {
-        let n = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(n, this.forward, this.stepSize);
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, n);
-        this.updateTransform();
-        return this.transform;
+        if (this.controls.angle < 35 && this.controls.angle >= 15) {
+            return this.transform;
+        }
     }
     addFlower() {
         this.updateTransformU();
@@ -17074,12 +17062,12 @@ class Turtle {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(n, this.right, temp);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, n);
         this.updateTransform();
-        return this.transform;
+        // return this.transform;
     }
     moveBackward() {
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].subtract(this.pos, this.pos, this.forward);
         this.updateTransform();
-        return this.transform;
+        // return this.transform;
     }
     moveForwardH() {
         let half = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
