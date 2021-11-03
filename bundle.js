@@ -6092,7 +6092,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-    iterations: 2,
+    iterations: 4,
     angle: 30,
     flower_color: [255, 170, 170],
     flower_scale: 3,
@@ -6106,10 +6106,10 @@ let time = 0.0;
 let changed = true;
 function backgroundSetup() {
     let colorsArray = [0.2, 0.1, 0.1, 1.0];
-    let col1sArray = [20, 0, 0, 0];
+    let col1sArray = [50, 0, 0, 0];
     let col2sArray = [0, 10, 0, 0];
-    let col3sArray = [0, 0, 20, 0];
-    let col4sArray = [0, -30, 0, 1];
+    let col3sArray = [0, 0, 50, 0];
+    let col4sArray = [0, -35, 0, 1];
     let colors = new Float32Array(colorsArray);
     let col1s = new Float32Array(col1sArray);
     let col2s = new Float32Array(col2sArray);
@@ -6184,15 +6184,11 @@ function main() {
         changed = true;
     }.bind(this));
     gui
-        .add(controls, 'flower_scale', 1, 5)
+        .add(controls, 'flower_scale', 1, 10)
         .step(0.5)
         .onChange(function () {
         changed = true;
     }.bind(this));
-    // gui.add(controls, 'speed', 0, 10).step(0.1);
-    // gui.add(controls, 'octaves', 3, 10).step(1);
-    // gui.add(controls, 'ambient_light', 1, 5).step(0.1);
-    // gui.add(controls, 'mode', { lambert: 0, 'blinn-phong': 1, 'ambient-only': 2, 'diffuse-only': 3, pulsing: 4, 'ink-wash': 5, 'night-light': 6 });
     // get canvas and webgl context
     const canvas = document.getElementById('canvas');
     const gl = canvas.getContext('webgl2');
@@ -6204,7 +6200,7 @@ function main() {
     Object(__WEBPACK_IMPORTED_MODULE_7__globals__["c" /* setGL */])(gl);
     // Initial call to load scene
     loadScene();
-    const camera = new __WEBPACK_IMPORTED_MODULE_6__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 50), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
+    const camera = new __WEBPACK_IMPORTED_MODULE_6__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 100), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 0, 0));
     const renderer = new __WEBPACK_IMPORTED_MODULE_5__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
     renderer.setClearColor(0.2, 0.2, 0.2, 1);
     // gl.enable(gl.BLEND);
@@ -16684,6 +16680,7 @@ class ShaderProgram {
 
 
 
+// import { random } from 'gl-matrix/src/gl-matrix/vec2';
 class LSystem {
     constructor(controls) {
         this.expansionRule = new __WEBPACK_IMPORTED_MODULE_1__ExpansionRule__["a" /* default */](controls);
@@ -16713,17 +16710,22 @@ class LSystem {
         data.flowers.col4 = [];
         let flower_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec4 */].fromValues(this.controls.flower_color[0] / 255.0, this.controls.flower_color[1] / 255.0, this.controls.flower_color[2] / 255.0, 1);
         let type = '';
+        let fcol1 = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["e" /* vec4 */].fromValues(0.9, 0.1, 0.6, 1.0);
         for (let currData of transforms) {
             if (currData.char.toUpperCase() == currData.char.toLowerCase()) {
                 continue;
             }
             let transformation = currData.transform;
-            // console.log('curr data: ' + transformation);
-            if (currData.char == 'U') {
+            if (currData.char == 'U' || currData.char == 'B') {
                 type = 'flowers';
-                data[type].color.push(flower_color[0]);
-                data[type].color.push(flower_color[1]);
-                data[type].color.push(flower_color[2]);
+                //add variation to color
+                let rand = Math.random();
+                let tempCol0 = flower_color[0] + rand * flower_color[0] * 0.5;
+                let tempCol1 = flower_color[1] - rand * flower_color[1] * 0.1;
+                let tempCol2 = flower_color[2] + (rand - 0.3) * flower_color[2] * 0.2;
+                data[type].color.push(tempCol0);
+                data[type].color.push(tempCol1);
+                data[type].color.push(tempCol2);
                 data[type].color.push(1);
             }
             else {
@@ -16731,7 +16733,6 @@ class LSystem {
                 data[type].color.push(0.06);
                 data[type].color.push(0.05);
                 data[type].color.push(0.05);
-                // type = 'flowers'; //comment out
                 // data[type].color.push(flower_color[0]);
                 // data[type].color.push(flower_color[1]);
                 // data[type].color.push(flower_color[2]);
@@ -16770,22 +16771,32 @@ class LSystem {
 //maintain a quaternion/ forward right
 class ExpansionRule {
     constructor(controls) {
-        this.axiom = 'X';
+        this.axiom = 'FX';
         this.grammar = new Map();
         this.grammar.set('F', this.expandF());
         this.grammar.set('X', this.expandX());
         this.grammar.set('U', this.expandU());
+        this.grammar.set('T', this.expandT());
+    }
+    expandT() {
+        return 'T0T0T';
     }
     //F = FF
     expandF() {
-        return 'FF';
+        return 'F';
     }
     //X = +F+F-[[X]+X]+F[+FX]-X
     expandX() {
-        return 'F+F-[[X]+X]+F[+FX]-X';
+        return 'FF-[[FXU]+XU]+FF[+FXU]-XUU';
     }
     expandU() {
-        return 'U';
+        let rand = Math.random();
+        if (rand < 0.9)
+            return 'B/B/B/B/B';
+        else if (rand < 0.8)
+            return 'B//B//B';
+        else
+            return 'U';
     }
     expandAxiom(iter) {
         let result = this.axiom;
@@ -16793,19 +16804,16 @@ class ExpansionRule {
             let curr = '';
             for (let old_sym of result) {
                 let func = this.grammar.get(old_sym);
-                console.log(old_sym);
-                console.log(func);
                 if (func) {
                     curr += func;
-                    console.log('+func= ' + curr);
                 }
                 else {
                     curr += old_sym;
-                    console.log('+old_sym= ' + curr);
                 }
             }
             result = curr;
         }
+        console.log('expandedStr' + result);
         return result;
     }
 }
@@ -16827,7 +16835,7 @@ class DrawingRule {
     constructor(controls) {
         this.rules = new Map();
         this.turtleStack = [];
-        this.turtle = new __WEBPACK_IMPORTED_MODULE_1__Turtle__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, -20, 0), //pos
+        this.turtle = new __WEBPACK_IMPORTED_MODULE_1__Turtle__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, -25, 0), //pos
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 1, 0), //up
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(1, 0, 0), //right
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(0, 2.5, 0), //forward
@@ -16843,8 +16851,10 @@ class DrawingRule {
         this.rules.set('F', this.turtle.moveForward.bind(this.turtle));
         this.rules.set('X', this.turtle.moveForward.bind(this.turtle));
         this.rules.set('U', this.turtle.moveForwardU.bind(this.turtle));
-        this.rules.set('B', this.turtle.moveBackward.bind(this.turtle));
+        this.rules.set('T', this.turtle.moveForwardT.bind(this.turtle));
+        this.rules.set('B', this.turtle.addFlower.bind(this.turtle));
         this.rules.set('+', this.turtle.rotatePos.bind(this.turtle));
+        this.rules.set('/', this.turtle.rotateF.bind(this.turtle));
         this.rules.set('-', this.turtle.rotateNeg.bind(this.turtle));
         this.rules.set('0', this.turtle.scaleDown.bind(this.turtle));
     }
@@ -16852,7 +16862,7 @@ class DrawingRule {
     presave() {
         let oldt = this.turtle.copy();
         this.turtleStack.push(oldt);
-        let amt = 0.98;
+        let amt = 0.995;
         let amt2 = 0.99;
         this.turtle.scale[0] *= amt;
         // this.turtle.scale[1] *= amt2;
@@ -16869,7 +16879,6 @@ class DrawingRule {
         if (t) {
             this.turtle.setTurtle(t);
         }
-        // console.log(this.turtle);
     }
     toRadian(angle) {
         return (angle * Math.PI) / 180.0;
@@ -16877,9 +16886,7 @@ class DrawingRule {
     draw(str) {
         // console.log('string in draw:' + str);
         //dummy string for testing
-        // str = 'F=FF[-F]+[+F]';
-        // str = 'FFFF++FF[F]+FF';
-        // str = 'F+F+F-F---FFFFU';
+        // str = 'FFB/B/B/B/B';
         let allData = [];
         allData.transforms = [];
         var i = 0;
@@ -16947,7 +16954,6 @@ class Turtle {
     }
     updateTransformU() {
         let s = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(this.controls.flower_scale, this.controls.flower_scale, this.controls.flower_scale);
-        let trans = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].create();
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* mat4 */].fromRotationTranslationScale(this.transform, this.quaternion, this.pos, s);
     }
     copy() {
@@ -16977,7 +16983,7 @@ class Turtle {
         this.stepSize[2] *= amt;
     }
     scaleUp() {
-        let amt = 5;
+        let amt = 2;
         this.scale[0] *= amt;
         this.scale[1] *= amt;
         this.scale[2] *= amt;
@@ -16986,19 +16992,30 @@ class Turtle {
         this.stepSize[2] *= amt;
     }
     moveForward() {
-        //update forward vector
         let n = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(n, this.forward, this.stepSize);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, n);
-        //update forward vector
         this.updateTransform();
         return this.transform;
     }
+    moveForwardT() {
+        let n = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
+        let tempScale = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
+        tempScale[0] = this.stepSize[0] * 5;
+        tempScale[1] = this.stepSize[1] * 0.5;
+        tempScale[2] = this.stepSize[2] * 5;
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(n, this.forward, tempScale);
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, n);
+        this.updateTransform();
+        return this.transform;
+    }
+    addFlower() {
+        this.updateTransformU();
+        return this.transform;
+    }
     moveForwardU() {
-        //update forward vector
         let half = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].create();
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].normalize(half, this.forward);
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].multiply(half, this.forward, this.scale);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].add(this.pos, this.pos, half);
         //update forward vector
         this.updateTransformU();
@@ -17034,7 +17051,12 @@ class Turtle {
     }
     //left and right
     rotatePos() {
-        this.rotate(0, 0, 1);
+        this.rotate(0, 1, 1);
+    }
+    rotateF() {
+        // this.rotate(0, 1, 0);
+        let rand = Math.random();
+        this.rotate(1.0 * rand, 1 * rand, 1 * rand, false, true);
     }
     //along y axis
     rotatePosY() {
@@ -17050,10 +17072,13 @@ class Turtle {
         this.rotate(0, 0, 1, true);
     }
     //pass in the axis
-    rotate(x, y, z, neg = false) {
+    rotate(x, y, z, neg = false, flower = false) {
         let deg = this.controls.angle;
         if (neg) {
             deg = -deg;
+        }
+        if (flower) {
+            deg *= 2.0;
         }
         let axis = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(x, y, z);
         let q = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* quat */].create();
@@ -17070,8 +17095,6 @@ class Turtle {
         // this.moveRight(neg, axis);
     }
     setTurtle(turtle) {
-        console.log(this.pos == turtle.pos);
-        // console.log(turtle.pos);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(this.pos, turtle.pos);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(this.forward, turtle.forward);
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].copy(this.up, turtle.up);
@@ -17193,7 +17216,7 @@ module.exports = "#version 300 es\n\nuniform mat4 u_ViewProj;\nuniform float u_T
 /* 76 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\nin vec4 fs_Col;\nin vec4 fs_Pos;\nin vec4 fs_Nor;\n\nout vec4 out_Col;\n\nin vec4 vs_Transform1;\n\nvoid main()\n{\n    // float dist = 1.0 - (length(fs_Pos.xyz) * 2.0);\n    // out_Col = vec4(dist) * fs_Col;\n\n    //lambert\n    vec3 dir = vec3(10,10,10) - fs_Pos.xyz;\n\tfloat diffuseTerm = dot(normalize(fs_Nor.xyz), normalize(dir));\n\tdiffuseTerm = clamp(diffuseTerm, 0.0, 1.0);\n\tfloat ambientTerm = 0.2;\n\n\tfloat lightIntensity = diffuseTerm + ambientTerm;\n\tout_Col =  clamp(vec4(fs_Col.rgb * lightIntensity, 1.0), 0.0, 1.0);\n\t// out_Col = vs_Transform1;\n}\n\n\n\n\n"
+module.exports = "#version 300 es\nprecision highp float;\n\nin vec4 fs_Col;\nin vec4 fs_Pos;\nin vec4 fs_Nor;\n\nout vec4 out_Col;\n\nin vec4 vs_Transform1;\n\nvoid main()\n{\n    // float dist = 1.0 - (length(fs_Pos.xyz) * 2.0);\n    // out_Col = vec4(dist) * fs_Col;\n\n    //lambert\n  vec3 dir = vec3(10,100,10) - fs_Pos.xyz;\n\tfloat diffuseTerm = dot(normalize(fs_Nor.xyz), normalize(dir));\n\tdiffuseTerm = clamp(diffuseTerm, 0.0, 1.0);\n\tfloat ambientTerm = 0.5;\n\n\tfloat lightIntensity = diffuseTerm + ambientTerm;\n\tout_Col =  clamp(vec4(fs_Col.rgb * lightIntensity, 1.0), 0.0, 1.0);\n\t// out_Col = vs_Transform1;\n}\n\n\n\n\n"
 
 /***/ }),
 /* 77 */
@@ -17205,7 +17228,7 @@ module.exports = "#version 300 es\nprecision highp float;\n\n// The vertex shade
 /* 78 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\nuniform vec3 u_Eye, u_Ref, u_Up;\nuniform vec2 u_Dimensions;\nuniform float u_Time;\n\nin vec2 fs_Pos;\nout vec4 out_Col;\n\n\n//toolbox functions\nfloat mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}\nvec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}\nvec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}\n\nfloat noise(vec3 p){\n    vec3 a = floor(p);\n    vec3 d = p - a;\n    d = d * d * (3.0 - 2.0 * d);\n\n    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);\n    vec4 k1 = perm(b.xyxy);\n    vec4 k2 = perm(k1.xyxy + b.zzww);\n\n    vec4 c = k2 + a.zzzz;\n    vec4 k3 = perm(c);\n    vec4 k4 = perm(c + 1.0);\n\n    vec4 o1 = fract(k3 * (1.0 / 41.0));\n    vec4 o2 = fract(k4 * (1.0 / 41.0));\n\n    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);\n    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);\n\n    return o4.y * d.y + o4.x * (1.0 - d.y);\n}\n\n#define NUM_OCTAVES 5\n\nfloat fbm(vec3 x) {\n\tfloat v = 0.0;\n\tfloat a = 0.9; //0.5\n  int o = NUM_OCTAVES;\n\tfor (int i = 0; i < o; ++i) {\n\t\tv += a * noise(x);\n\t\tx = x * 2.25 + 2.0; //2.0\n\t\ta *= 0.55; //0.5\n\t}\n\treturn v;\n}\n\nvoid main() {\n  vec3 pos = vec3(fs_Pos,1.0);\n  float warp_noise = fbm(pos.xyz + fbm( pos.xyz + fbm( pos.xyz )));\n\n  out_Col = vec4(0.5 * (fs_Pos + vec2(1.0)), 0.0, 1.0) * warp_noise;\n  out_Col += vec4(0.1,0.2,0.2,0.0);\n  //avg r,g,b\n  float avg = (out_Col.r+out_Col.g+out_Col.b)/3.0;\n  out_Col = vec4(avg,avg,avg,1.f);\n}\n\n\n"
+module.exports = "#version 300 es\nprecision highp float;\n\nuniform vec3 u_Eye, u_Ref, u_Up;\nuniform vec2 u_Dimensions;\nuniform float u_Time;\n\nin vec2 fs_Pos;\nout vec4 out_Col;\n\n\n//toolbox functions\nfloat mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}\nvec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}\nvec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}\n\nfloat noise(vec3 p){\n    vec3 a = floor(p);\n    vec3 d = p - a;\n    d = d * d * (3.0 - 2.0 * d);\n\n    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);\n    vec4 k1 = perm(b.xyxy);\n    vec4 k2 = perm(k1.xyxy + b.zzww);\n\n    vec4 c = k2 + a.zzzz;\n    vec4 k3 = perm(c);\n    vec4 k4 = perm(c + 1.0);\n\n    vec4 o1 = fract(k3 * (1.0 / 41.0));\n    vec4 o2 = fract(k4 * (1.0 / 41.0));\n\n    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);\n    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);\n\n    return o4.y * d.y + o4.x * (1.0 - d.y);\n}\n\n#define NUM_OCTAVES 5\n\nfloat fbm(vec3 x) {\n\tfloat v = 0.0;\n\tfloat a = 0.9; //0.5\n  int o = NUM_OCTAVES;\n\tfor (int i = 0; i < o; ++i) {\n\t\tv += a * noise(x);\n\t\tx = x * 2.25 + 2.0; //2.0\n\t\ta *= 0.55; //0.5\n\t}\n\treturn v;\n}\n\nvoid main() {\n  vec3 pos = vec3(fs_Pos,1.0);\n  float warp_noise = fbm(pos.xyz + fbm( pos.xyz + fbm( pos.xyz )));\n\n  out_Col = vec4(0.5 * (fs_Pos + vec2(1.0)), 0.0, 1.0) * warp_noise;\n  out_Col += vec4(0.2,-0.1,0.8,0.0);\n  //avg r,g,b\n  float avg = (out_Col.r+out_Col.g+out_Col.b)/10.0;\n  out_Col += vec4(avg,avg,avg,0.f);\n  out_Col = min(out_Col,vec4(1,0.98,1,1.f));\n}\n\n\n"
 
 /***/ })
 /******/ ]);
