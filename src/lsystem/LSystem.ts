@@ -5,6 +5,7 @@ import DrawingRule from './DrawingRule';
 import ShaderProgram from '../rendering/gl/ShaderProgram';
 import Mesh from '../geometry/Mesh';
 import { readTextFile, toRadian } from '../globals';
+// import { random } from 'gl-matrix/src/gl-matrix/vec2';
 
 class LSystem {
   expansionRule: ExpansionRule;
@@ -49,25 +50,29 @@ class LSystem {
     );
 
     let type: string = '';
+    let fcol1 = vec4.fromValues(0.9, 0.1, 0.6, 1.0);
 
     for (let currData of transforms) {
       if (currData.char.toUpperCase() == currData.char.toLowerCase()) {
         continue;
       }
       let transformation: mat4 = currData.transform;
-      // console.log('curr data: ' + transformation);
-      if (currData.char == 'U') {
+      if (currData.char == 'U' || currData.char == 'B') {
         type = 'flowers';
-        data[type].color.push(flower_color[0]);
-        data[type].color.push(flower_color[1]);
-        data[type].color.push(flower_color[2]);
+        //add variation to color
+        let rand: number = Math.random();
+        let tempCol0: number = flower_color[0] + rand * flower_color[0] * 0.5;
+        let tempCol1: number = flower_color[1] - rand * flower_color[1] * 0.1;
+        let tempCol2: number = flower_color[2] + (rand - 0.3) * flower_color[2] * 0.2;
+        data[type].color.push(tempCol0);
+        data[type].color.push(tempCol1);
+        data[type].color.push(tempCol2);
         data[type].color.push(1);
       } else {
         type = 'trunks';
         data[type].color.push(0.06);
         data[type].color.push(0.05);
         data[type].color.push(0.05);
-        // type = 'flowers'; //comment out
         // data[type].color.push(flower_color[0]);
         // data[type].color.push(flower_color[1]);
         // data[type].color.push(flower_color[2]);

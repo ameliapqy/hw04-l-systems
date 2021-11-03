@@ -13,7 +13,7 @@ class DrawingRule {
 
   constructor(controls: any) {
     this.turtle = new Turtle(
-      vec3.fromValues(0, -20, 0), //pos
+      vec3.fromValues(0, -25, 0), //pos
       vec3.fromValues(0, 1, 0), //up
       vec3.fromValues(1, 0, 0), //right
       vec3.fromValues(0, 2.5, 0), //forward
@@ -30,9 +30,11 @@ class DrawingRule {
     this.rules.set('F', this.turtle.moveForward.bind(this.turtle));
     this.rules.set('X', this.turtle.moveForward.bind(this.turtle));
     this.rules.set('U', this.turtle.moveForwardU.bind(this.turtle));
-    this.rules.set('B', this.turtle.moveBackward.bind(this.turtle));
+    this.rules.set('T', this.turtle.moveForwardT.bind(this.turtle));
+    this.rules.set('B', this.turtle.addFlower.bind(this.turtle));
 
     this.rules.set('+', this.turtle.rotatePos.bind(this.turtle));
+    this.rules.set('/', this.turtle.rotateF.bind(this.turtle));
     this.rules.set('-', this.turtle.rotateNeg.bind(this.turtle));
     this.rules.set('0', this.turtle.scaleDown.bind(this.turtle));
   }
@@ -41,7 +43,7 @@ class DrawingRule {
   presave() {
     let oldt = this.turtle.copy();
     this.turtleStack.push(oldt);
-    let amt = 0.98;
+    let amt = 0.995;
     let amt2 = 0.99;
     this.turtle.scale[0] *= amt;
     // this.turtle.scale[1] *= amt2;
@@ -59,7 +61,6 @@ class DrawingRule {
     if (t) {
       this.turtle.setTurtle(t);
     }
-    // console.log(this.turtle);
   }
 
   toRadian(angle: number) {
@@ -69,9 +70,7 @@ class DrawingRule {
   draw(str: string) {
     // console.log('string in draw:' + str);
     //dummy string for testing
-    // str = 'F=FF[-F]+[+F]';
-    // str = 'FFFF++FF[F]+FF';
-    // str = 'F+F+F-F---FFFFU';
+    // str = 'FFB/B/B/B/B';
     let allData: any = [];
     allData.transforms = [];
     var i: number = 0;

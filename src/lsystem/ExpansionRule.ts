@@ -9,25 +9,32 @@ class ExpansionRule {
   controls: any;
 
   constructor(controls: any) {
-    this.axiom = 'X';
+    this.axiom = 'FX';
     this.grammar = new Map();
     this.grammar.set('F', this.expandF());
     this.grammar.set('X', this.expandX());
     this.grammar.set('U', this.expandU());
+    this.grammar.set('T', this.expandT());
   }
 
+  expandT() {
+    return 'T0T0T';
+  }
   //F = FF
   expandF() {
-    return 'FF';
+    return 'F';
   }
 
   //X = +F+F-[[X]+X]+F[+FX]-X
   expandX() {
-    return 'F+F-[[X]+X]+F[+FX]-X';
+    return 'FF-[[FXU]+XU]+FF[+FXU]-XUU';
   }
 
   expandU() {
-    return 'U';
+    let rand = Math.random();
+    if (rand < 0.9) return 'B/B/B/B/B';
+    else if (rand < 0.8) return 'B//B//B';
+    else return 'U';
   }
 
   expandAxiom(iter: number) {
@@ -37,18 +44,15 @@ class ExpansionRule {
       let curr: string = '';
       for (let old_sym of result) {
         let func = this.grammar.get(old_sym);
-        console.log(old_sym);
-        console.log(func);
         if (func) {
           curr += func;
-          console.log('+func= ' + curr);
         } else {
           curr += old_sym;
-          console.log('+old_sym= ' + curr);
         }
       }
       result = curr;
     }
+    console.log('expandedStr' + result);
     return result;
   }
 }

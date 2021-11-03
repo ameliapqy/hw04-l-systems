@@ -17,7 +17,7 @@ import Mesh from './geometry/Mesh';
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-  iterations: 2,
+  iterations: 4,
   angle: 30,
   flower_color: [255, 170, 170],
   flower_scale: 3,
@@ -35,10 +35,10 @@ let changed: boolean = true;
 function backgroundSetup() {
   let colorsArray = [0.2, 0.1, 0.1, 1.0];
 
-  let col1sArray = [20, 0, 0, 0];
+  let col1sArray = [50, 0, 0, 0];
   let col2sArray = [0, 10, 0, 0];
-  let col3sArray = [0, 0, 20, 0];
-  let col4sArray = [0, -30, 0, 1];
+  let col3sArray = [0, 0, 50, 0];
+  let col4sArray = [0, -35, 0, 1];
 
   let colors: Float32Array = new Float32Array(colorsArray);
   let col1s: Float32Array = new Float32Array(col1sArray);
@@ -137,17 +137,13 @@ function main() {
     }.bind(this)
   );
   gui
-    .add(controls, 'flower_scale', 1, 5)
+    .add(controls, 'flower_scale', 1, 10)
     .step(0.5)
     .onChange(
       function () {
         changed = true;
       }.bind(this)
     );
-  // gui.add(controls, 'speed', 0, 10).step(0.1);
-  // gui.add(controls, 'octaves', 3, 10).step(1);
-  // gui.add(controls, 'ambient_light', 1, 5).step(0.1);
-  // gui.add(controls, 'mode', { lambert: 0, 'blinn-phong': 1, 'ambient-only': 2, 'diffuse-only': 3, pulsing: 4, 'ink-wash': 5, 'night-light': 6 });
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement>document.getElementById('canvas');
@@ -162,7 +158,7 @@ function main() {
   // Initial call to load scene
   loadScene();
 
-  const camera = new Camera(vec3.fromValues(0, 0, 50), vec3.fromValues(0, 0, 0));
+  const camera = new Camera(vec3.fromValues(0, 0, 100), vec3.fromValues(0, 0, 0));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.2, 0.2, 0.2, 1);

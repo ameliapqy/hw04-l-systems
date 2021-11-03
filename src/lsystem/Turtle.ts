@@ -33,7 +33,6 @@ class Turtle {
 
   updateTransformU() {
     let s: vec3 = vec3.fromValues(this.controls.flower_scale, this.controls.flower_scale, this.controls.flower_scale);
-    let trans: mat4 = mat4.create();
 
     mat4.fromRotationTranslationScale(this.transform, this.quaternion, this.pos, s);
   }
@@ -73,7 +72,7 @@ class Turtle {
   }
 
   scaleUp() {
-    let amt = 5;
+    let amt = 2;
     this.scale[0] *= amt;
     this.scale[1] *= amt;
     this.scale[2] *= amt;
@@ -83,27 +82,39 @@ class Turtle {
   }
 
   moveForward() {
-    //update forward vector
     let n = vec3.create();
     vec3.multiply(n, this.forward, this.stepSize);
     vec3.add(this.pos, this.pos, n);
-    //update forward vector
     this.updateTransform();
     return this.transform;
   }
 
+  moveForwardT() {
+    let n = vec3.create();
+    let tempScale = vec3.create();
+    tempScale[0] = this.stepSize[0] * 5;
+    tempScale[1] = this.stepSize[1] * 0.5;
+    tempScale[2] = this.stepSize[2] * 5;
+    vec3.multiply(n, this.forward, tempScale);
+    vec3.add(this.pos, this.pos, n);
+    this.updateTransform();
+    return this.transform;
+  }
+
+  addFlower() {
+    this.updateTransformU();
+    return this.transform;
+  }
+
   moveForwardU() {
-    //update forward vector
     let half = vec3.create();
     vec3.normalize(half, this.forward);
-    vec3.multiply(half, this.forward, this.scale);
     vec3.add(this.pos, this.pos, half);
     //update forward vector
 
     this.updateTransformU();
     return this.transform;
   }
-
   moveRight(neg: boolean = false, axis: vec3) {
     let n = vec3.create();
     let temp = vec3.create();
@@ -137,7 +148,13 @@ class Turtle {
 
   //left and right
   rotatePos() {
-    this.rotate(0, 0, 1);
+    this.rotate(0, 1, 1);
+  }
+
+  rotateF() {
+    // this.rotate(0, 1, 0);
+    let rand = Math.random();
+    this.rotate(1.0 * rand, 1 * rand, 1 * rand, false, true);
   }
 
   //along y axis
@@ -157,10 +174,13 @@ class Turtle {
   }
 
   //pass in the axis
-  rotate(x: number, y: number, z: number, neg: boolean = false) {
+  rotate(x: number, y: number, z: number, neg: boolean = false, flower: boolean = false) {
     let deg = this.controls.angle;
     if (neg) {
       deg = -deg;
+    }
+    if (flower) {
+      deg *= 2.0;
     }
 
     let axis = vec3.fromValues(x, y, z);
@@ -183,8 +203,6 @@ class Turtle {
   }
 
   setTurtle(turtle: Turtle) {
-    console.log(this.pos == turtle.pos);
-    // console.log(turtle.pos);
     vec3.copy(this.pos, turtle.pos);
     vec3.copy(this.forward, turtle.forward);
     vec3.copy(this.up, turtle.up);
