@@ -126,7 +126,7 @@ function main() {
       }.bind(this)
     );
   gui
-    .add(controls, 'angle', 15, 35)
+    .add(controls, 'angle', 15, 100)
     .step(1)
     .onChange(
       function () {
