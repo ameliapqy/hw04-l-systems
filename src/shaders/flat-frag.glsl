@@ -8,58 +8,65 @@ uniform float u_Time;
 in vec2 fs_Pos;
 out vec4 out_Col;
 
-
-//toolbox functions
-float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
-vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
-vec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}
-
-float noise(vec3 p){
-    vec3 a = floor(p);
-    vec3 d = p - a;
-    d = d * d * (3.0 - 2.0 * d);
-
-    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);
-    vec4 k1 = perm(b.xyxy);
-    vec4 k2 = perm(k1.xyxy + b.zzww);
-
-    vec4 c = k2 + a.zzzz;
-    vec4 k3 = perm(c);
-    vec4 k4 = perm(c + 1.0);
-
-    vec4 o1 = fract(k3 * (1.0 / 41.0));
-    vec4 o2 = fract(k4 * (1.0 / 41.0));
-
-    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);
-    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);
-
-    return o4.y * d.y + o4.x * (1.0 - d.y);
+float rand3D(vec3 p) {
+    return fract(sin(dot(p, vec3(dot(p,vec3(127.1, 311.7, 456.9)),
+                          dot(p,vec3(269.5, 183.3, 236.6)),
+                          dot(p, vec3(420.6, 631.2, 235.1))
+                    ))) * 438648.5453);
 }
 
-#define NUM_OCTAVES 5
+float interpNoise3D(float x, float y, float z) {
+    int intX = int(floor(x));
+    float fractX = fract(x);
+    int intY = int(floor(y));
+    float fractY = fract(y);
+    int intZ = int(floor(z));
+    float fractZ = fract(z);
 
-float fbm(vec3 x) {
-	float v = 0.0;
-	float a = 0.9; //0.5
-  int o = NUM_OCTAVES;
-	for (int i = 0; i < o; ++i) {
-		v += a * noise(x);
-		x = x * 2.25 + 2.0; //2.0
-		a *= 0.55; //0.5
-	}
-	return v;
+    float v1 = rand3D(vec3(intX, intY, intZ));
+    float v2 = rand3D(vec3(intX + 1, intY, intZ));
+    float v3 = rand3D(vec3(intX, intY + 1, intZ));
+    float v4 = rand3D(vec3(intX + 1, intY + 1, intZ));
+
+    float v5 = rand3D(vec3(intX, intY, intZ + 1));
+    float v6 = rand3D(vec3(intX + 1, intY, intZ + 1));
+    float v7 = rand3D(vec3(intX, intY + 1, intZ + 1));
+    float v8 = rand3D(vec3(intX + 1, intY + 1, intZ + 1));
+
+    float i1 = mix(v1, v2, fractX);
+    float i2 = mix(v3, v4, fractX);
+
+    float i3 = mix(v5, v6, fractX);
+    float i4 = mix(v7, v8, fractX);
+
+    float i5 = mix(i1, i2, fractY);
+    float i6 = mix(i3, i4, fractY);
+
+    float i7 = mix(i5, i6, fractZ);
+
+    return i7;
 }
+
+float fbm(float x, float y, float z) {
+    float total = 0.0;
+    float persistence = 0.5;
+    int octaves = 8;
+
+    for(int i = 1; i <= octaves; i++) {
+        float freq = pow(2.0, float(i));
+        float amp = pow(persistence, float(i));
+
+        total += interpNoise3D(x * freq,
+                               y * freq,
+                               z * freq) * amp;
+    }
+    return total;
+}
+
 
 void main() {
-  vec3 pos = vec3(fs_Pos,1.0);
-  float warp_noise = fbm(pos.xyz + fbm( pos.xyz + fbm( pos.xyz )));
-
-  out_Col = vec4(0.5 * (fs_Pos + vec2(1.0)), 0.0, 1.0) * warp_noise;
-  out_Col += vec4(0.2,-0.1,0.8,0.0);
-  //avg r,g,b
-  float avg = (out_Col.r+out_Col.g+out_Col.b)/10.0;
-  out_Col += vec4(avg,avg,avg,0.f);
-  out_Col = min(out_Col,vec4(1,0.98,1,1.f));
+  float n = 1.0 - fbm(fs_Pos.x + 0.1 * sin(0.005 * float(u_Time)), fs_Pos.y + 0.1 * sin(0.005 * float(u_Time)), sin(0.005 * float(u_Time)) * fs_Pos.x);
+  //n = fbm(n,n,n);
+  //out_Col = vec4(0.5 * (fs_Pos + vec2(1.0)), 0.0, 1.0);
+  out_Col = vec4(n, n, n, 1.0);
 }
-
-

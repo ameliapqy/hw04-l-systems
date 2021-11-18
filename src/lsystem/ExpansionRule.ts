@@ -53,7 +53,7 @@ class ExpansionRule {
       }
       result = curr;
     }
-    console.log('expandedStr' + result);
+    // console.log('expandedStr' + result);
     return result;
   }
 }
