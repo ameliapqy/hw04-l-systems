@@ -15,6 +15,7 @@ class ExpansionRule {
     this.grammar.set('X', this.expandX());
     this.grammar.set('U', this.expandU());
     this.grammar.set('T', this.expandT());
+    this.grammar.set('5', this.expand5());
   }
 
   expandT() {
@@ -38,6 +39,11 @@ class ExpansionRule {
     else if (rand < 0.8) return 'B///B//B';
     else return '/U';
   }
+
+  expand5() {
+    return '444+[[45U]-4UU';
+  }
+
   expandAxiom(iter: number) {
     let result: string = this.axiom;
 

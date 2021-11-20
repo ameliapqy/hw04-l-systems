@@ -35,12 +35,7 @@ class Turtle {
 
   updateTransformU() {
     let fs1 = this.controls.flower_scale;
-
-    if (this.controls.angle < 35 && this.controls.angle >= 15) {
-      fs1 += fs1 * Math.random();
-    } else {
-      fs1 = Math.max(fs1, 2 * Math.random());
-    }
+    fs1 += fs1 * Math.random();
 
     let s: vec3 = vec3.fromValues(fs1, fs1, fs1);
 
@@ -106,10 +101,24 @@ class Turtle {
     vec3.multiply(n, this.forward, this.stepSize);
     vec3.add(this.pos, this.pos, n);
     this.updateTransform();
-    if (this.controls.angle < 35 && this.controls.angle >= 15) {
-      return this.transform;
-    }
+    return this.transform;
   }
+
+  moveForward4() {
+    let n = vec3.create();
+    vec3.multiply(n, this.forward, this.stepSize);
+    vec3.add(this.pos, this.pos, n);
+    this.updateTransformUR();
+  }
+
+  moveForwardT() {
+    let n = vec3.create();
+    vec3.multiply(n, this.forward, this.stepSize);
+    vec3.add(this.pos, this.pos, n);
+    this.updateTransform();
+    return this.transform;
+  }
+
   addFlower() {
     this.updateTransformU();
     return this.transform;
@@ -138,13 +147,13 @@ class Turtle {
     vec3.multiply(n, this.right, temp);
     vec3.add(this.pos, this.pos, n);
     this.updateTransform();
-    // return this.transform;
+    return this.transform;
   }
 
   moveBackward() {
     vec3.subtract(this.pos, this.pos, this.forward);
     this.updateTransform();
-    // return this.transform;
+    return this.transform;
   }
 
   moveForwardH() {

@@ -30,7 +30,9 @@ class DrawingRule {
     this.rules.set('F', this.turtle.moveForward.bind(this.turtle));
     this.rules.set('X', this.turtle.moveForward.bind(this.turtle));
     this.rules.set('U', this.turtle.moveForwardU.bind(this.turtle));
-    this.rules.set('T', this.turtle.moveForward.bind(this.turtle));
+    this.rules.set('T', this.turtle.moveForwardT.bind(this.turtle));
+    this.rules.set('4', this.turtle.moveForward4.bind(this.turtle));
+    this.rules.set('5', this.turtle.moveForward4.bind(this.turtle));
     this.rules.set('B', this.turtle.addFlower.bind(this.turtle));
     this.rules.set('A', this.turtle.moveBackward.bind(this.turtle));
 
