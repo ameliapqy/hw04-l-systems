@@ -126,7 +126,7 @@ function main() {
       }.bind(this)
     );
   gui
-    .add(controls, 'angle', 15, 35)
+    .add(controls, 'angle', 15, 100)
     .step(1)
     .onChange(
       function () {
@@ -186,7 +186,7 @@ function main() {
 
   const instancedShader = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/instanced-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/instanced-frag_old.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/instanced-frag.glsl')),
   ]);
 
   const flat = new ShaderProgram([
