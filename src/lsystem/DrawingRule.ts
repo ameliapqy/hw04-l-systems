@@ -16,7 +16,7 @@ class DrawingRule {
       vec3.fromValues(0, -25, 0), //pos
       vec3.fromValues(0, 1, 0), //up
       vec3.fromValues(1, 0, 0), //right
-      vec3.fromValues(0, 2.5, 0), //forward
+      vec3.fromValues(0, 1, 0), //forward
       vec3.fromValues(1, 1, 1), //scale
       quat.fromValues(0, 0, 0, 1), //quat
       3, //recursion depth

@@ -63,7 +63,8 @@ void main() {
   // out_Col = min(out_Col,vec4(1,0.98,1,1.f));
 
   out_Col = vec4(pos.x,pos.y,pos.z, 1.0);
-  out_Col *= 5.0;
+  out_Col.xyz /= 5.0;
+  out_Col = max(vec4(0.0), out_Col);
 
 }
 

@@ -25,7 +25,7 @@ class Turtle {
     this.depth = depth;
     this.controls = controls;
     this.scale = scale;
-    this.stepSize = vec3.fromValues(1, 1, 1);
+    this.stepSize = vec3.fromValues(1,3,3);
     this.tempScale = vec3.fromValues(5.0, 5.0, 5.0);
   }
 
@@ -97,8 +97,8 @@ class Turtle {
     this.scale[1] *= amt2;
     this.scale[2] *= amt;
     // this.stepSize[0] /= 0.1;
-    this.stepSize[1] *= amt2;
-    this.stepSize[2] *= 1.1;
+    this.stepSize[1] *= 1;
+    this.stepSize[2] *= 1;
   }
 
   scaleUp() {

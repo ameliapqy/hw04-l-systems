@@ -23,7 +23,13 @@ class ExpansionRule {
 
   //F = FF
   expandF() {
-    return 'FF[-F][+F]';
+    // return 'FF[-F][+F]';
+    return 'FF[-F++F][+F--F]'
+  }
+
+  expandG() {
+    // return 'FF[-F][+F]';
+    return 'FF[-F++F][+F--F]'
   }
 
   //X = +F+F-[[X]+X]+F[+FX]-X
