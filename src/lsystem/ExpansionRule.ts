@@ -9,7 +9,7 @@ class ExpansionRule {
   controls: any;
 
   constructor(controls: any) {
-    this.axiom = 'TAAAX5';
+    this.axiom = 'X';//'TAAAX5';
     this.grammar = new Map();
     this.grammar.set('F', this.expandF());
     this.grammar.set('X', this.expandX());
@@ -29,7 +29,7 @@ class ExpansionRule {
   //X = +F+F-[[X]+X]+F[+FX]-X
   //'FF+[[FXU]+XU]+FF[+FXU]-XUU';
   expandX() {
-    return 'FFF-[[FXU]+XU]+FF[+FXU]-XUU';
+    return 'FFF-[[FX]+X]+FF[+FX]-X';
   }
 
   expandU() {
