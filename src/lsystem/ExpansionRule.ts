@@ -9,7 +9,7 @@ class ExpansionRule {
   controls: any;
 
   constructor(controls: any) {
-    this.axiom = 'X';//'TAAAX5';
+    this.axiom = '2[F]/[F]/[F]/[F]/[F]/[F]';//'TAAAX5';
     this.grammar = new Map();
     this.grammar.set('F', this.expandF());
     this.grammar.set('X', this.expandX());
@@ -23,13 +23,13 @@ class ExpansionRule {
 
   //F = FF
   expandF() {
-    return 'F';
+    return 'FF[-F][+F]';
   }
 
   //X = +F+F-[[X]+X]+F[+FX]-X
   //'FF+[[FXU]+XU]+FF[+FXU]-XUU';
   expandX() {
-    return 'FFF-[[FX]+X]+FF[+FX]-X';
+    return 'FF[-F][+F]';
   }
 
   expandU() {
@@ -38,6 +38,7 @@ class ExpansionRule {
     else if (rand < 0.8) return 'B///B//B';
     else return '/U';
   }
+
   expandAxiom(iter: number) {
     let result: string = this.axiom;
 

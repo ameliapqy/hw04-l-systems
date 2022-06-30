@@ -39,18 +39,19 @@ class DrawingRule {
     this.rules.set('-', this.turtle.rotateNeg.bind(this.turtle));
     this.rules.set('1', this.turtle.scaleUp.bind(this.turtle));
     this.rules.set('0', this.turtle.scaleDown.bind(this.turtle));
+    this.rules.set('2', this.turtle.scaleLong.bind(this.turtle));
   }
 
   //[
   presave() {
     let oldt = this.turtle.copy();
     this.turtleStack.push(oldt);
-    let amt = 0.995;
-    let amt2 = 0.99;
-    this.turtle.scale[0] *= amt;
-    this.turtle.scale[2] *= amt;
-    this.turtle.scale[0] = Math.max(this.turtle.scale[0], 0.25);
-    this.turtle.scale[2] = Math.max(this.turtle.scale[2], 0.25);
+    // let amt = 0.995;
+    // let amt2 = 0.99;
+    // this.turtle.scale[0] *= amt;
+    // this.turtle.scale[2] *= amt;
+    // this.turtle.scale[0] = Math.max(this.turtle.scale[0], 0.25);
+    // this.turtle.scale[2] = Math.max(this.turtle.scale[2], 0.25);
   }
 
   //]

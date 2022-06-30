@@ -17,8 +17,9 @@ import Mesh from './geometry/Mesh';
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-  iterations: 5,
+  iterations: 3,
   angle: 25,
+  biggerAngle: 60,
   flower_color: [255, 170, 170],
   flower_scale: 4,
   speed: 1,
@@ -100,7 +101,7 @@ function loadScene() {
   flower = new Mesh(flowerObj, vec3.fromValues(0, 0, 0));
   flower.create();
 
-  backgroundSetup();
+  // backgroundSetup();
 
   //lsystem
   lsystermSetup();
@@ -127,6 +128,14 @@ function main() {
     );
   gui
     .add(controls, 'angle', 15, 100)
+    .step(1)
+    .onChange(
+      function () {
+        changed = true;
+      }.bind(this)
+    );
+    gui
+    .add(controls, 'biggerAngle', 15, 100)
     .step(1)
     .onChange(
       function () {
@@ -176,7 +185,7 @@ function main() {
   // Initial call to load scene
   loadScene();
 
-  const camera = new Camera(vec3.fromValues(100, 10, 50), vec3.fromValues(0, 10, 0));
+  const camera = new Camera(vec3.fromValues(100, 0, 0), vec3.fromValues(0, -20, 0));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.2, 0.2, 0.2, 1);

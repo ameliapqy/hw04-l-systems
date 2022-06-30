@@ -90,6 +90,17 @@ class Turtle {
     this.stepSize[2] /= amt;
   }
 
+  scaleLong() {
+    let amt = 0.2;
+    let amt2 = 1;
+    this.scale[0] *= amt;
+    this.scale[1] *= amt2;
+    this.scale[2] *= amt;
+    // this.stepSize[0] /= 0.1;
+    this.stepSize[1] *= amt2;
+    this.stepSize[2] *= 1.1;
+  }
+
   scaleUp() {
     let amt = 1.05;
     let amt2 = 0.8;
@@ -106,9 +117,10 @@ class Turtle {
     vec3.multiply(n, this.forward, this.stepSize);
     vec3.add(this.pos, this.pos, n);
     this.updateTransform();
-    if (this.controls.angle < 35 && this.controls.angle >= 15) {
-      return this.transform;
-    }
+    // if (this.controls.angle < 35 && this.controls.angle >= 15) {
+    //   return this.transform;
+    // }
+    return this.transform;
   }
   addFlower() {
     this.updateTransformU();
@@ -157,28 +169,30 @@ class Turtle {
 
   //left and right
   rotatePos() {
-    this.rotate(0, 1, 1);
+    this.rotate(1, 0,0);
   }
 
   rotateF() {
-    let rand = Math.random();
-    this.rotate(1.0 * rand, 1 * rand, 1 * rand, false, true);
+    this.rotate(1, 0,0,false,false,this.controls.biggerAngle);
   }
+
+
 
   //along y axis
   rotatePosY() {
-    this.rotate(0, 1, 0);
+    // this.rotate(0, 1, 0);
   }
 
   //rotate for flower
   rotateFR() {
-    let rand = Math.random();
-    this.rotate(1.0 * rand, 1 * rand, 1 * rand, false, true);
-    return this.transform;
+    // let rand = Math.random();
+    // this.rotate(1.0 * rand, 1 * rand, 1 * rand, false, true);
+    // return this.transform;
+
   }
 
   rotateNeg() {
-    this.rotate(0, 0, 1, true);
+    this.rotate(1,0,0, true);
   }
 
   //pass in the axis

@@ -50,7 +50,7 @@ class LSystem {
     );
 
     let type: string = '';
-    let fcol1 = vec4.fromValues(0.9, 0.1, 0.6, 1.0);
+    // let fcol1 = vec4.fromValues(0.9, 0.1, 0.6, 1.0);
 
     for (let currData of transforms) {
       if (currData.char.toUpperCase() == currData.char.toLowerCase()) {
